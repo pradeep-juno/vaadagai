@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:vaadagai/app_router/app_router.dart';
+import 'package:vaadagai/app_controller/auth_controller.dart';
+import 'package:vaadagai/app_utils/app_constants.dart';
 import 'package:vaadagai/app_utils/app_functions.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -11,18 +12,33 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final AuthController authController = Get.put(AuthController());
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-          child: buildTextFun(
-        context,
-        "welcome to login page",
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: Colors.black,
-        buttonpress: true,
-        onTap: () => Get.offNamed(AppRouter.REGISTER_SCREEN),
+    return SafeArea(
+      child: Scaffold(
+          body: ListView(
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              buildSizedBoxHeightFun(context, height: 40),
+              buildAuthHeaderFun(context, AppConstants.loginCaps),
+              buildSizedBoxHeightFun(context, height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    buildLoginBodyFun(context, authController),
+                    buildSizedBoxHeightFun(context, height: 20),
+                    buildLoginButtonFun(context, authController),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ],
       )),
     );
   }

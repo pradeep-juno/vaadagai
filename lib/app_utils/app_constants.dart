@@ -18,10 +18,14 @@ class AppConstants {
   static const confirmPassword = "Confirm Password";
   static const registerAs = "Register as";
   static const buyer = "Buyer";
-  static const seller = "Seller";
-  static const register = "Register";
-  static const alreadyHaveAccount = "Already have an account? Login ";
-  static const login = "Login";
+  static const agent = "Agent";
+  static const alreadyHaveAccountLogin = "Already have an account? Login ";
+  static const dontHaveAccountRegister = "Don't have an account? Register ";
+  static const registerCaps = "REGISTER";
+  static const loginCaps = "LOGIN";
+  static const loginAs = "Login as";
+  static const registerSmall = "Register";
+  static const loginSmall = "login";
 
   //Images
   static const vaadagaiLogoUrl =
@@ -32,5 +36,10 @@ class AppConstants {
 
   //firestore database
 
-  static const collectionRegister = "register";
+  static const collectionAuth = "authentication";
+  static const collectionLogin = "login";
+
+  //Scaffold messages
+
+  static const registerSuccessfully = "Register successfully";
 }

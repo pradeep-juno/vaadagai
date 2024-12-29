@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       ),
       title: AppConstants.vaadagai,
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRouter.REGISTER_SCREEN,
+      initialRoute: AppRouter.LOGIN_SCREEN,
       getPages: AppRouter.routes,
     );
   }
