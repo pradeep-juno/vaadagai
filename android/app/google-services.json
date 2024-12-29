@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "708167083575",
+    "project_id": "vaadagai-64012",
+    "storage_bucket": "vaadagai-64012.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708167083575:android:8e532901617da21d9d41b2",
+        "android_client_info": {
+          "package_name": "com.example.vaadagai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOmStiq9S-oGurnXBJ6Q1kOYyG7BOETmk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
