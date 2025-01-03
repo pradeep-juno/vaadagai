@@ -1,12 +1,67 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:vaadagai/app_controller/splash_controller.dart';
 import 'package:vaadagai/app_utils/app_constants.dart';
+import 'package:vaadagai/storage_services/users_storage_service.dart';
 
-class SplashScreen extends StatelessWidget {
-  SplashScreen({super.key});
+import '../app_router/app_router.dart';
+import '../app_utils/app_functions.dart';
 
-  final SplashController splashController = Get.put(SplashController());
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _navigateBasedOnAuthState();
+  }
+
+  Future<void> _navigateBasedOnAuthState() async {
+    await Future.delayed(const Duration(seconds: 2));
+
+    User? user = FirebaseAuth.instance.currentUser;
+
+    DocumentSnapshot<Map<String, dynamic>> userDoc = await FirebaseFirestore
+        .instance
+        .collection(AppConstants.collectionAuth)
+        .doc(user?.uid)
+        .get();
+
+    if (userDoc.exists) {
+      Map<String, dynamic>? userData = userDoc.data();
+
+      if (userData != null) {
+        String authAs = userData['authAs'] ?? 'User';
+
+        print("SplashScreen -> authAs : $authAs");
+
+        String? localUserType = UsersStorageService.getUserType();
+
+        print("SplashScreen -> localUserType : $localUserType");
+
+        if ((authAs == localUserType) &&
+            (authAs == AppConstants.agent) &&
+            (localUserType == AppConstants.agent)) {
+          Get.offNamed(AppRouter.AGENT_MAIN_SCREEN);
+        } else if ((authAs == localUserType) &&
+            (authAs == AppConstants.buyer) &&
+            (localUserType == AppConstants.buyer)) {
+          Get.offNamed(AppRouter.BUYER_MAIN_SCREEN);
+        }
+      } else {
+        buildScaffoldMessage(
+            context, 'User data is incomplete. Please contact support.');
+      }
+    } else {
+      buildScaffoldMessage(context, 'No user data found in Database.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +70,7 @@ class SplashScreen extends StatelessWidget {
         body: Center(
           child: Image.network(
             AppConstants.vaadagaiLogoUrl,
-            height: 150, // Replace with your image URL
+            height: 150,
             width: 150,
           ),
         ),

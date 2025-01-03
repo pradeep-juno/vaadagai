@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vaadagai/app_utils/app_colors.dart';
 import 'package:vaadagai/app_utils/app_constants.dart';
@@ -13,6 +14,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await GetStorage.init();
   runApp(const MyApp());
 }
 
@@ -35,7 +37,7 @@ class MyApp extends StatelessWidget {
       ),
       title: AppConstants.vaadagai,
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRouter.LOGIN_SCREEN,
+      initialRoute: AppRouter.AGENT_ADD_SALE_SCREEN,
       getPages: AppRouter.routes,
     );
   }

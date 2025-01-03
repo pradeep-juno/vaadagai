@@ -18,7 +18,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.backgroundWhite,
         body: Stack(
           children: [
             ListView(
@@ -42,15 +42,13 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                           height: 70, width: 80),
                       buildSizedBoxHeightFun(context, height: 10),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: buildTextFun(
-                          context,
-                          AppConstants.getStartedDescription,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w300,
-                          color: AppColors.grey,
-                        ),
-                      ),
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: buildTextFun(
+                              context, AppConstants.getStartedDescription,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w300,
+                              color: AppColors.grey,
+                              largetext: true)),
                     ],
                   ),
                 ),
@@ -62,10 +60,12 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                 right: 60,
                 child: buildContainerButtonFun(context, AppConstants.getStarted,
                     fontSize: 16,
+                    height: 44,
+                    width: 240,
                     fontWeight: FontWeight.w500,
                     color: AppColors.orange, onPressed: () {
                   print('Get Started button clicked!');
-                  Get.offNamed(AppRouter.REGISTER_SCREEN);
+                  Get.offNamed(AppRouter.LOGIN_SCREEN);
                 })),
           ],
         ),

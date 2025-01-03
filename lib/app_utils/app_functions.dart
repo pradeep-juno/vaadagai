@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:vaadagai/app_controller/add_property_controller.dart';
 
 import '../app_controller/auth_controller.dart';
 import '../app_router/app_router.dart';
@@ -36,6 +37,7 @@ buildImageFun(BuildContext context, String image,
     image,
     height: height,
     width: width,
+    fit: BoxFit.fitWidth,
   );
 }
 
@@ -46,49 +48,201 @@ buildTextFun(
   required FontWeight fontWeight,
   required Color color,
   bool buttonpress = false, // Default is false, meaning normal text
-  VoidCallback? onTap, // Optional callback for the tap action
+  VoidCallback? onTap,
+  VoidCallback? onIconTap,
+  Icon? prefixIcon,
+  Color? circleColor,
+  bool largetext = false,
+  // Optional callback for the tap action
 }) {
   return InkWell(
     onTap:
         buttonpress ? onTap : null, // Apply onTap only if buttonpress is true
-    child: Text(
-      text,
-      style: GoogleFonts.poppins(
-        fontSize: fontSize,
-        fontWeight: fontWeight,
-        color: color,
+    child: Row(
+      mainAxisSize: MainAxisSize.min, // Fit the content
+      children: [
+        if (prefixIcon != null) // Only show the icon if it's provided
+          InkWell(
+            onTap: onIconTap,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 10), // Add some spacing
+              child: prefixIcon,
+            ),
+          ),
+        Flexible(
+          child: Text(
+            text,
+            textAlign: largetext ? TextAlign.center : TextAlign.start,
+            style: GoogleFonts.poppins(
+              fontSize: fontSize,
+              fontWeight: fontWeight,
+              color: color,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  // return InkWell(
+  //   onTap:
+  //       buttonpress ? onTap : null, // Apply onTap only if buttonpress is true
+  //   child: Text(
+  //     text,
+  //     style: GoogleFonts.poppins(
+  //       fontSize: fontSize,
+  //       fontWeight: fontWeight,
+  //       color: color,
+  //     ),
+  //   ),
+  // );
+}
+
+Widget buildContainerButtonFun(
+  BuildContext context,
+  String text, {
+  required int fontSize,
+  required FontWeight fontWeight,
+  Color? color,
+  Function()? onPressed,
+  required double height,
+  required double width,
+  Color? fontColor = Colors.white,
+  bool circle = false,
+  Color? circleColor = Colors.black,
+  bool showIcon = false,
+  bool centerText = true,
+  double borderRadius = 32,
+  Color? circleTextColor = AppColors.orange,
+  // New parameter to control text alignment
+}) {
+  return GestureDetector(
+    onTap: onPressed,
+    child: Container(
+      height: height,
+      width: width,
+      decoration: circle
+          ? BoxDecoration(
+              borderRadius: BorderRadius.circular(borderRadius),
+              border: Border.all(color: circleColor!, width: 2.3),
+            )
+          : BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(32),
+            ),
+      child: Row(
+        mainAxisAlignment: centerText
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.start, // Conditional alignment for text
+        children: [
+          if (showIcon) ...[
+            Icon(
+              Icons.add,
+              color: AppColors.orange,
+              size: 24,
+            ),
+            buildSizedBoxWidthFun(context, width: 5),
+          ],
+          buildSizedBoxWidthFun(context,
+              width: centerText ? 5 : 16), // Add padding for left alignment
+          buildTextFun(
+            context,
+            text,
+            fontSize: 16, // Use the parameter instead of hardcoded value
+            fontWeight: fontWeight,
+            color: circle ? circleTextColor! : fontColor!,
+          ),
+        ],
       ),
     ),
   );
 }
 
-buildContainerButtonFun(BuildContext context, String text,
-    {required int fontSize,
-    required FontWeight fontWeight,
-    required Color color,
-    bool isSmallSize = false,
-    Function()? onPressed}) {
-  return GestureDetector(
-    onTap: onPressed,
-    child: Container(
-      height: isSmallSize ? 56 : 48,
-      width: isSmallSize ? 343 : MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: Center(
-        child: buildTextFun(
-          context,
-          text,
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: Colors.white,
-        ),
-      ),
-    ),
-  );
-}
+// Widget buildTextFormFieldFun(
+//     {required BuildContext context,
+//     required String text,
+//     required String hintText,
+//     TextEditingController? controller,
+//     bool isSmallSize = true,
+//     double? fontSize,
+//     TextInputType? keyboardType,
+//     List<TextInputFormatter>? inputFormatters,
+//     bool isPassword = false,
+//     String? prefixImage,
+//     bool isHeightSize = true}) {
+//   bool obscureText = isPassword;
+//   return Column(
+//     crossAxisAlignment: CrossAxisAlignment.start,
+//     children: [
+//       // Field Label
+//       buildTextFun(
+//         context,
+//         text,
+//         fontSize: 16,
+//         fontWeight: FontWeight.w500,
+//         color: Colors.black,
+//       ),
+//       buildSizedBoxHeightFun(context, height: 6),
+//       StatefulBuilder(
+//         builder: (context, setState) {
+//           return Container(
+//             height: isHeightSize ? 56 : 194,
+//             width: 343,
+//             decoration: BoxDecoration(
+//               borderRadius: BorderRadius.circular(32.0),
+//               border: Border.all(color: Colors.grey),
+//             ),
+//             child: TextFormField(
+//               controller: controller,
+//               keyboardType: keyboardType,
+//               inputFormatters: inputFormatters,
+//               obscureText: isPassword ? obscureText : false,
+//               maxLines: isHeightSize ? 1 : null,
+//               // Single line for small size, multi-line otherwise
+//               maxLength: isHeightSize ? null : 500,
+//               decoration: InputDecoration(
+//                 hintText: hintText,
+//                 border: InputBorder.none,
+//                 hintStyle: TextStyle(
+//                   fontSize: fontSize ?? 14,
+//                   color: AppColors.grey,
+//                 ),
+//                 contentPadding: const EdgeInsets.symmetric(
+//                   vertical: 16.0, // Adjust padding to align the text vertically
+//                   horizontal: 16.0,
+//                 ),
+//                 prefixIcon: prefixImage != null
+//                     ? Padding(
+//                         padding: const EdgeInsets.all(
+//                             12.0), // Adjust padding as needed
+//                         child: buildImageFun(context, prefixImage,
+//                             height: 20, width: 20))
+//                     : null,
+//                 suffixIcon: isPassword
+//                     ? IconButton(
+//                         icon: Icon(
+//                           obscureText ? Icons.visibility_off : Icons.visibility,
+//                           color: Colors.grey,
+//                         ),
+//                         onPressed: () {
+//                           setState(() {
+//                             obscureText = !obscureText;
+//                           });
+//                         },
+//                       )
+//                     : null,
+//               ),
+//               style: const TextStyle(
+//                 overflow: TextOverflow
+//                     .ellipsis, // Ensures text does not overflow the field
+//               ),
+//             ),
+//           );
+//         },
+//       ),
+//     ],
+//   );
+// }
 
 Widget buildTextFormFieldFun({
   required BuildContext context,
@@ -100,7 +254,12 @@ Widget buildTextFormFieldFun({
   TextInputType? keyboardType,
   List<TextInputFormatter>? inputFormatters,
   bool isPassword = false,
-  bool prefixIcon = false,
+  String? prefixImage,
+  bool isHeightSize = true,
+  bool dropdown = false,
+  List<String>? dropdownItems,
+  ValueChanged<String?>? onChanged,
+  RxString? selectedValue, // Add this parameter to bind the selected value
 }) {
   bool obscureText = isPassword;
   return Column(
@@ -118,43 +277,102 @@ Widget buildTextFormFieldFun({
       StatefulBuilder(
         builder: (context, setState) {
           return Container(
-            height: 56,
+            height: isHeightSize ? 56 : 194,
             width: 343,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(32.0),
               border: Border.all(color: Colors.grey),
             ),
-            child: TextFormField(
-              controller: controller,
-              keyboardType: keyboardType,
-              inputFormatters: inputFormatters,
-              obscureText: isPassword ? obscureText : false,
-              decoration: InputDecoration(
-                hintText: hintText,
-                border: InputBorder.none,
-                hintStyle: TextStyle(
-                  fontSize: fontSize ?? 14,
-                  color: Colors.grey,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 16.0, // Adjust padding to align the text vertically
-                  horizontal: 16.0,
-                ),
-                suffixIcon: isPassword
-                    ? IconButton(
-                        icon: Icon(
-                          obscureText ? Icons.visibility_off : Icons.visibility,
-                          color: Colors.grey,
+            child: dropdown
+                ? Obx(() {
+                    return DropdownButtonFormField<String>(
+                      value: selectedValue?.value.isEmpty ?? true
+                          ? null
+                          : selectedValue?.value,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16.0,
+                          horizontal: 16.0,
                         ),
-                        onPressed: () {
-                          setState(() {
-                            obscureText = !obscureText;
-                          });
-                        },
-                      )
-                    : null,
-              ),
-            ),
+                        prefixIcon: prefixImage != null
+                            ? Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: buildImageFun(context, prefixImage,
+                                    height: 20, width: 20),
+                              )
+                            : null,
+                      ),
+                      dropdownColor: Colors.white,
+                      menuMaxHeight: 100,
+                      hint: Text(
+                        hintText,
+                        style: TextStyle(
+                          fontSize: fontSize ?? 14,
+                          color: AppColors.grey,
+                        ),
+                      ),
+                      items: dropdownItems
+                          ?.map((item) => DropdownMenuItem<String>(
+                                value: item,
+                                child: Text(item),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        if (selectedValue != null) {
+                          selectedValue.value = value ?? '';
+                        }
+                        if (onChanged != null) {
+                          onChanged(value);
+                        }
+                      },
+                    );
+                  })
+                : TextFormField(
+                    controller: controller,
+                    keyboardType: keyboardType,
+                    inputFormatters: inputFormatters,
+                    obscureText: isPassword ? obscureText : false,
+                    maxLines: isHeightSize ? 1 : null,
+                    maxLength: isHeightSize ? null : 500,
+                    decoration: InputDecoration(
+                      hintText: hintText,
+                      border: InputBorder.none,
+                      hintStyle: TextStyle(
+                        fontSize: fontSize ?? 14,
+                        color: AppColors.grey,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 16.0,
+                        horizontal: 16.0,
+                      ),
+                      prefixIcon: prefixImage != null
+                          ? Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: buildImageFun(context, prefixImage,
+                                  height: 20, width: 20),
+                            )
+                          : null,
+                      suffixIcon: isPassword
+                          ? IconButton(
+                              icon: Icon(
+                                obscureText
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  obscureText = !obscureText;
+                                });
+                              },
+                            )
+                          : null,
+                    ),
+                    style: const TextStyle(
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
           );
         },
       ),
@@ -182,11 +400,14 @@ buildLoginButtonFun(BuildContext context, AuthController authController) {
   return Column(
     children: [
       buildContainerButtonFun(context, AppConstants.loginSmall,
+          height: 50,
+          width: MediaQuery.of(context).size.width,
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: AppColors.orange, onPressed: () {
         print('Login button clicked!');
-        authController.register(context);
+
+        authController.login(context);
       }),
       buildSizedBoxHeightFun(context, height: 5),
       buildTextFun(
@@ -195,9 +416,10 @@ buildLoginButtonFun(BuildContext context, AuthController authController) {
         fontSize: 14,
         fontWeight: FontWeight.w400,
         color: AppColors.grey,
-        buttonpress: true, // This will make the text clickable
+        buttonpress: true,
+        // This will make the text clickable
         onTap: () {
-          print('Text clicked!');
+          print('Dont HaveAccountRegister Text clicked!');
           Get.offNamed(AppRouter.REGISTER_SCREEN);
         },
       )
@@ -298,4 +520,381 @@ buildAuthHeaderFun(BuildContext context, String title) {
     ],
   );
 }
+
 //-------------------Register Functions----------------------//
+Widget buildCustomScrollbar({
+  required Widget child,
+  bool thumbVisibility = true,
+  double thickness = 4.0,
+  Radius radius = const Radius.circular(5),
+}) {
+  return Scrollbar(
+    thumbVisibility: thumbVisibility,
+    thickness: thickness,
+    radius: radius,
+    child: child,
+  );
+}
+
+buildRegisterButtonFun(BuildContext context, AuthController authController) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        buildContainerButtonFun(context, AppConstants.registerSmall,
+            fontSize: 16,
+            height: 50,
+            width: MediaQuery.of(context).size.width,
+            fontWeight: FontWeight.w500,
+            color: AppColors.orange, onPressed: () {
+          print('Register button clicked!');
+          authController.register(context);
+        }),
+        buildSizedBoxHeightFun(context, height: 5),
+        buildTextFun(
+          context,
+          AppConstants.alreadyHaveAccountLogin,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: AppColors.grey,
+          buttonpress: true,
+          // This will make the text clickable
+          onTap: () {
+            print('Dont HaveAccountRegister Text clicked!');
+            Get.offNamed(AppRouter.LOGIN_SCREEN);
+          },
+        )
+      ],
+    ),
+  );
+}
+
+buildRegisterBodyFun(BuildContext context, AuthController authController) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    child: Column(
+      children: [
+        buildTextFormFieldFun(
+          context: context,
+          text: AppConstants.name,
+          hintText: AppConstants.enterYourName,
+          controller: authController.authNameController,
+          isSmallSize: false,
+        ),
+        buildSizedBoxHeightFun(context, height: 20),
+        buildTextFormFieldFun(
+          context: context,
+          text: AppConstants.mobileNumber,
+          hintText: AppConstants.enterTenDigitNumber,
+          controller: authController.authMobileNumberController,
+          keyboardType: TextInputType.phone,
+          inputFormatters: [LengthLimitingTextInputFormatter(10)],
+          isSmallSize: false,
+        ),
+        buildSizedBoxHeightFun(context, height: 20),
+        buildTextFormFieldFun(
+          context: context,
+          text: AppConstants.emailAddress,
+          hintText: AppConstants.enterEmailId,
+          controller: authController.authEmailAddressController,
+          keyboardType: TextInputType.emailAddress,
+          isSmallSize: false,
+        ),
+        buildSizedBoxHeightFun(context, height: 20),
+        buildTextFormFieldFun(
+            context: context,
+            text: AppConstants.password,
+            hintText: AppConstants.enterYourPassword,
+            controller: authController.authPasswordController,
+            isPassword: true,
+            isSmallSize: false,
+            inputFormatters: [LengthLimitingTextInputFormatter(8)]),
+        buildSizedBoxHeightFun(context, height: 20),
+        buildTextFormFieldFun(
+            context: context,
+            text: AppConstants.confirmPassword,
+            hintText: AppConstants.confirmPassword,
+            controller: authController.authConfirmPasswordController,
+            isPassword: true,
+            isSmallSize: false,
+            inputFormatters: [LengthLimitingTextInputFormatter(8)]),
+        buildSizedBoxHeightFun(context, height: 20),
+        Obx(() => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                buildTextFun(
+                  context,
+                  AppConstants.registerAs,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.black,
+                ),
+                buildSizedBoxWidthFun(context, width: 20),
+                buildTextFun(
+                  context,
+                  AppConstants.buyer,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.black,
+                ),
+                Radio<String>(
+                  value: AppConstants.buyer,
+                  groupValue: authController.radioButton.value,
+                  onChanged: (value) {
+                    authController.radioButton.value = value!;
+                    print("Selected: ${AppConstants.buyer}");
+                  },
+                  activeColor: AppColors.orange,
+                ),
+                buildSizedBoxWidthFun(context, width: 8),
+                buildTextFun(
+                  context,
+                  AppConstants.agent,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.black,
+                ),
+                Radio<String>(
+                  value: AppConstants.agent,
+                  groupValue: authController.radioButton.value,
+                  onChanged: (value) {
+                    authController.radioButton.value = value!;
+                    print("Selected: ${AppConstants.agent}");
+                  },
+                  activeColor: AppColors.orange,
+                ),
+              ],
+            )),
+      ],
+    ),
+  );
+}
+// top logo image function
+
+buildTopLogoFun(BuildContext context, String imageUrl,
+    {double height = 46, double width = 52}) {
+  return Align(
+    alignment:
+        Alignment.topLeft, // Ensures the logo is aligned to the top-left corner
+    child: Padding(
+      padding: const EdgeInsets.only(
+          top: 8, left: 26), // Padding from the top and left
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4), // Border radius of 4
+        child: Image.network(
+          imageUrl,
+          height: height,
+          width: width,
+          fit: BoxFit.cover, // Adjust BoxFit if needed
+        ),
+      ),
+    ),
+  );
+}
+
+//----------------------------------ADD SALE-----------------------------//
+
+buildAgentAddSaleHeaderFun(BuildContext context, String addProperty) {
+  return Column(
+    crossAxisAlignment:
+        CrossAxisAlignment.start, // Aligns children to the start
+    children: [
+      buildTopLogoFun(context, AppConstants.vaadagaiLogoUrl),
+      buildSizedBoxHeightFun(context, height: 10),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                print('property add screen click');
+                Get.offNamed(AppRouter.PROPERTY_ADD_SCREEN);
+              },
+              child: const Icon(Icons.arrow_back),
+            ),
+            const SizedBox(width: 8), // Adds spacing between the icon and text
+            buildTextFun(
+              context,
+              addProperty,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: AppColors.black,
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+buildAgentAddSaleBodyFun(
+  context,
+  AddPropertyController addPropertyController,
+) {
+  {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          buildTextFormFieldFun(
+            context: context,
+            text: AppConstants.propertyType,
+            hintText: AppConstants.choosePropertyType,
+            dropdown: true,
+            dropdownItems: addPropertyController.propertyTypeItems,
+            selectedValue: addPropertyController.selectedPropertyType,
+            onChanged: (value) {
+              print("Selected value: $value");
+            },
+            prefixImage: AppConstants.propertytypeIconImage,
+          ),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.postalCode,
+              hintText: AppConstants.enterPostalCode,
+              controller: addPropertyController.addPostalCodeController,
+              isSmallSize: false,
+              prefixImage: AppConstants.hashtagIconImage,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.unit,
+              hintText: AppConstants.enterUnit,
+              controller: addPropertyController.addUnitController,
+              keyboardType: TextInputType.emailAddress,
+              isSmallSize: false,
+              prefixImage: AppConstants.unitIconImage,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(4),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+            context: context,
+            text: AppConstants.street,
+            hintText: AppConstants.enterTheStreet,
+            controller: addPropertyController.addStreetController,
+            isSmallSize: false,
+            prefixImage: AppConstants.streetIconImage,
+          ),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.totalFloors,
+              hintText: AppConstants.totalFloors,
+              controller: addPropertyController.addTotalFloorsController,
+              isSmallSize: false,
+              prefixImage: AppConstants.floorIconImage,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(3),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.floorNo,
+              hintText: AppConstants.floorNo,
+              controller: addPropertyController.addFloorNoController,
+              isSmallSize: false,
+              prefixImage: AppConstants.floorIconImage,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(4),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.builtUpAreaSqft,
+              hintText: AppConstants.sqFt,
+              controller: addPropertyController.addSqftController,
+              isSmallSize: false,
+              prefixImage: AppConstants.sqftIconImage,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(5),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.bhk,
+              hintText: AppConstants.enterBhk,
+              controller: addPropertyController.addBhkController,
+              isSmallSize: false,
+              prefixImage: AppConstants.bhkIconImage,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(2),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.bathrooms,
+              hintText: AppConstants.noOfBathrooms,
+              controller: addPropertyController.addBathroomsController,
+              isSmallSize: false,
+              prefixImage: AppConstants.bathroomIconImage,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(2),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.price,
+              hintText: AppConstants.price,
+              controller: addPropertyController.addPriceController,
+              isSmallSize: false,
+              prefixImage: AppConstants.pricetagIconImage,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.additionalDetails,
+              hintText: AppConstants.typeHere,
+              controller: addPropertyController.addAdditionalDetailsController,
+              isSmallSize: false,
+              isHeightSize: false),
+        ],
+      ),
+    );
+  }
+}
+
+buildAgentAddSaleButtonFun(
+    BuildContext context, AddPropertyController addPropertyController) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        buildContainerButtonFun(context, AppConstants.done,
+            fontSize: 16,
+            height: 50,
+            width: MediaQuery.of(context).size.width,
+            fontWeight: FontWeight.w500,
+            color: AppColors.orange, onPressed: () {
+          print('Register button clicked!');
+          addPropertyController.addProperty(context);
+        }),
+      ],
+    ),
+  );
+}
+
+Widget loadingProgress(BuildContext context) {
+  return const Center(
+    child: CircularProgressIndicator(
+      backgroundColor: AppColors.primaryBlue,
+      color: AppColors.white,
+    ),
+  );
+}
