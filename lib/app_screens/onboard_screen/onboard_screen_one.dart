@@ -19,7 +19,6 @@ class _OnboardScreenOneState extends State<OnboardScreenOne> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     onBoardController.toggleButton();
   }
@@ -28,72 +27,92 @@ class _OnboardScreenOneState extends State<OnboardScreenOne> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          backgroundColor: Colors.white,
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  buildImageFun(
-                    context,
-                    AppConstants.onboardScreenImaegeOne,
-                    width: MediaQuery.of(context).size.width,
+                  Stack(
+                    children: [
+                      buildImageFun(
+                        context,
+                        AppConstants.onboardScreenImaegeOne,
+                        width: MediaQuery.of(context).size.width,
+                      ),
+                      Positioned(
+                        top: 34,
+                        right: 15,
+                        left: 240,
+                        child: buildContainerButtonFun(
+                          context,
+                          AppConstants.skip,
+                          fontSize: 14,
+                          fontColor: AppColors.orange,
+                          onPressed: () {
+                            print('skip button clicked!');
+                            Get.offNamed(AppRouter.ONBOARD_SCREEN_THREE);
+                          },
+                          fontWeight: FontWeight.w500,
+                          showIcon: false,
+                          color: AppColors.backgroundWhite,
+                          height: 40,
+                          width: 90,
+                        ),
+                      ),
+                    ],
                   ),
-                  Positioned(
-                    top: 34,
-                    right: 15,
-                    left: 240,
-                    child: buildContainerButtonFun(
+                  buildSizedBoxHeightFun(context, height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: buildTextFun(
                       context,
-                      AppConstants.skip,
-                      fontSize: 14,
-                      fontColor: AppColors.orange,
-                      onPressed: () {
-                        print('skip button clicked!');
-                        Get.offNamed(AppRouter.ONBOARD_SCREEN_THREE);
-                      },
-                      fontWeight: FontWeight.w500,
-                      showIcon: false,
-                      color: AppColors.backgroundWhite,
-                      height: 40,
-                      width: 90,
-                    ),
-                  )
-                ],
-              ),
-              buildSizedBoxHeightFun(context, height: 10),
-              Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: buildTextFun(
-                      context, AppConstants.onBoardingScreenOneDescriptionFirst,
+                      AppConstants.onBoardingScreenOneDescriptionFirst,
                       fontSize: 24,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.black)),
-              buildSizedBoxHeightFun(context, height: 10),
-              Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: buildTextFun(context,
+                      color: AppColors.black,
+                    ),
+                  ),
+                  buildSizedBoxHeightFun(context, height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: buildTextFun(
+                      context,
                       AppConstants.onBoardingScreenOneDescriptionSecond,
                       fontSize: 14,
                       fontWeight: FontWeight.w300,
-                      color: AppColors.grey)),
-              buildSizedBoxHeightFun(context, height: 30),
-              Positioned(
-                  bottom: 15,
-                  child: Center(
-                    child: buildContainerButtonFun(context, AppConstants.next,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.orange, onPressed: () {
-                      print('next button clicked!');
-                      Get.offNamed(AppRouter.ONBOARD_SCREEN_TWO);
-                    },
-                        fontColor: AppColors.backgroundWhite,
-                        height: 48,
-                        width: 240),
-                  ))
-            ],
-          )),
+                      color: AppColors.grey,
+                    ),
+                  ),
+                  buildSizedBoxHeightFun(context, height: 30),
+                ],
+              ),
+            ),
+            Positioned(
+              bottom: 15,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: buildContainerButtonFun(
+                  context,
+                  AppConstants.next,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.orange,
+                  onPressed: () {
+                    print('next button clicked!');
+                    Get.offNamed(AppRouter.ONBOARD_SCREEN_TWO);
+                  },
+                  fontColor: AppColors.backgroundWhite,
+                  height: 48,
+                  width: 240,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

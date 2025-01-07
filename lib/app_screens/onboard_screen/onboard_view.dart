@@ -19,9 +19,9 @@ class _OnboardViewState extends State<OnboardView> {
   @override
   Widget build(BuildContext context) {
     final onboardScreens = [
-      OnboardScreenOne(),
-      OnboardScreenTwo(),
-      OnboardScreenThree()
+      const OnboardScreenOne(),
+      const OnboardScreenTwo(),
+      const OnboardScreenThree()
     ];
 
     return SafeArea(

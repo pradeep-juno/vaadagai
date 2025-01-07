@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../app_controller/auth_controller.dart';
+import '../../../app_controller/add_property_controller.dart';
 import '../../../app_utils/app_constants.dart';
 import '../../../app_utils/app_functions.dart';
 
@@ -9,11 +9,13 @@ class AgentAddRentScreen extends StatefulWidget {
   const AgentAddRentScreen({super.key});
 
   @override
-  State<AgentAddRentScreen> createState() => _AgentAddRentScreenState();
+  State<AgentAddRentScreen> createState() => _AgentAddSaleScreenState();
 }
 
-class _AgentAddRentScreenState extends State<AgentAddRentScreen> {
-  final AuthController authController = Get.put(AuthController());
+class _AgentAddSaleScreenState extends State<AgentAddRentScreen> {
+  final AddPropertyController addPropertyController =
+      Get.put(AddPropertyController());
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -26,22 +28,23 @@ class _AgentAddRentScreenState extends State<AgentAddRentScreen> {
               child: buildCustomScrollbar(
                 child: SingleChildScrollView(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      buildAgentHeaderFun(context, AppConstants.addProperty),
                       buildSizedBoxHeightFun(context, height: 30),
-                      buildAuthHeaderFun(context, AppConstants.registerCaps),
-                      buildSizedBoxHeightFun(context, height: 30),
-                      buildRegisterBodyFun(context, authController),
+                      buildAgentAddRentBodyFun(
+                        context,
+                        addPropertyController,
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
             Positioned(
-              bottom: 10,
+              bottom: 30,
               left: 60,
               right: 60,
-              child: buildRegisterButtonFun(context, authController),
+              child: buildAgentAddRentButtonFun(context, addPropertyController),
             ),
           ],
         ),

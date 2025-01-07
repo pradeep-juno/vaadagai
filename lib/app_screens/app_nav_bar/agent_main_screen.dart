@@ -7,6 +7,7 @@ import 'package:vaadagai/app_screens/app_nav_bar/agent_schedules_screen.dart';
 import 'package:vaadagai/app_utils/app_colors.dart';
 import 'package:vaadagai/app_utils/app_constants.dart';
 import 'package:vaadagai/app_utils/app_functions.dart';
+import 'package:vaadagai/storage_services/users_storage_service.dart';
 
 import '../../app_controller/agent_controller.dart';
 
@@ -19,6 +20,20 @@ class AgentMainScreen extends StatefulWidget {
 
 class _AgentMainScreenState extends State<AgentMainScreen> {
   final AgentController controller = Get.put(AgentController());
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      int initialIndex = Get.arguments ?? 0;
+
+      // Set the selectedIndex to the value passed in arguments
+      controller.selectedIndex.value = initialIndex;
+      String userId = UsersStorageService.getUserId().toString();
+      print("AGENT_MAIN_SCREEN : USER_ID => $userId");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

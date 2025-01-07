@@ -75,18 +75,18 @@ class AuthController extends GetxController {
 
           isLoading.value = false;
           // Show success message and navigate to login screen
-          buildScaffoldMessage(context, "Registered successfully");
+          buildScaffoldSuccessMessage(context, "Registered successfully");
           clearController();
           Get.offNamed(AppRouter.ONBOARD_VIEW);
 
           //save locally
         } else {
           isLoading.value = false;
-          buildScaffoldMessage(context, "User creation failed.");
+          buildScaffoldErrorMessage(context, "User creation failed.");
         }
       } catch (e) {
         isLoading.value = false;
-        buildScaffoldMessage(context, 'Failed to register: $e');
+        buildScaffoldErrorMessage(context, 'Failed to register: $e');
       }
     }
   }
@@ -99,66 +99,68 @@ class AuthController extends GetxController {
     String authConfirmPassword = authConfirmPasswordController.text.trim();
 
     if (authName.isEmpty) {
-      buildScaffoldMessage(context, 'Please enter Name');
+      buildScaffoldErrorMessage(context, 'Please enter Name');
       return false;
     }
     if (authMobileNumber.isEmpty) {
-      buildScaffoldMessage(context, 'Please enter Mobile Number');
+      buildScaffoldErrorMessage(context, 'Please enter Mobile Number');
       return false;
     } else if (authMobileNumber.length < 10) {
-      buildScaffoldMessage(
+      buildScaffoldErrorMessage(
           context, 'Invalid mobile number, must be at least 10 digits');
       return false;
     } else if (await isFieldExist('authMobileNumber', authMobileNumber)) {
-      buildScaffoldMessage(context, 'Mobile number already Register');
+      buildScaffoldErrorMessage(context, 'Mobile number already Register');
       return false;
     }
 
     if (authEmailAddress.isEmpty) {
-      buildScaffoldMessage(context, 'Please enter Email Address');
+      buildScaffoldErrorMessage(context, 'Please enter Email Address');
       return false;
     } else {
       // Using EmailValidator to check general email format
       if (!EmailValidator.validate(authEmailAddress)) {
-        buildScaffoldMessage(context, 'Please enter a valid Email Address');
+        buildScaffoldErrorMessage(
+            context, 'Please enter a valid Email Address');
         return false;
       } else {
         // Additional check for Gmail domain
         if (!authEmailAddress.endsWith('@gmail.com')) {
-          buildScaffoldMessage(
+          buildScaffoldErrorMessage(
               context, 'Please enter a valid Gmail address (e.g., @gmail.com)');
           return false;
         } else if (await isFieldExist('authEmailAddress', authEmailAddress)) {
-          buildScaffoldMessage(context, 'Email address already Registered');
+          buildScaffoldErrorMessage(
+              context, 'Email address already Registered');
           return false;
         }
       }
     }
 
     if (authPassword.isEmpty) {
-      buildScaffoldMessage(context, 'Please enter Password');
+      buildScaffoldErrorMessage(context, 'Please enter Password');
       return false;
     } else if (authPassword.length < 4) {
-      buildScaffoldMessage(context, 'Password atleast min 4 letters');
+      buildScaffoldErrorMessage(context, 'Password atleast min 4 letters');
       return false;
     }
 
     if (authConfirmPassword.isEmpty) {
-      buildScaffoldMessage(context, 'Please enter Confirm Password');
+      buildScaffoldErrorMessage(context, 'Please enter Confirm Password');
       return false;
     } else if (authConfirmPassword.length < 4) {
-      buildScaffoldMessage(context, 'Password atleast min 4 letters');
+      buildScaffoldErrorMessage(context, 'Password atleast min 4 letters');
       return false;
     }
 
     if (authPassword != authConfirmPassword) {
-      buildScaffoldMessage(
+      buildScaffoldErrorMessage(
           context, 'Password and Confirm Password does not match');
       return false;
     }
 
     if (radioButton.value.isEmpty) {
-      buildScaffoldMessage(context, 'Please select (Buyer or Agent)');
+      buildScaffoldErrorMessage(context, 'Please select (Buyer or Agent)');
       return false;
     }
     return true;
@@ -193,7 +195,7 @@ class AuthController extends GetxController {
       String authPassword = authPasswordController.text.trim();
 
       if (authEmailAddress.isEmpty || authPassword.isEmpty) {
-        buildScaffoldMessage(context, 'Email or Password cannot be empty');
+        buildScaffoldErrorMessage(context, 'Email or Password cannot be empty');
         isLoading.value = false;
         return;
       }
@@ -221,8 +223,11 @@ class AuthController extends GetxController {
               String authName = userData['authName'] ?? 'User';
               String authMobileNumber =
                   userData['authMobileNumber'] ?? 'Unknown';
+              String authEmailAddress =
+                  userData['authEmailAddress'] ?? 'Unknown';
+              String authPassword = userData['authPassword'] ?? 'Unknown';
 
-              print("authAs : $authAs");
+              print("authAsLoginScreen : $authAs");
               print("authMobileNumber : $authMobileNumber");
 
               isLoading.value = false;
@@ -230,145 +235,156 @@ class AuthController extends GetxController {
               // Navigate based on the authAs value
               if ((radioButton.value == AppConstants.agent) &&
                   (authAs == AppConstants.agent)) {
-                buildScaffoldMessage(
+                buildScaffoldSuccessMessage(
                     context, 'Login Successful, Welcome $authName!');
-                Get.offNamed(AppRouter.ONBOARD_VIEW);
+
+                UsersStorageService.saveUser(
+                  user.uid,
+                  authName,
+                  authMobileNumber,
+                  authEmailAddress,
+                  authPassword,
+                  authAs,
+                );
+
+                /*
+                 UsersStorageService.saveUser(
+              user.uid,
+              authNameController.text.trim(),
+              authMobileNumberController.text.trim(),
+              authEmailAddressController.text.trim(),
+              authPasswordController.text.trim(),
+              radioButton.value);
+                 */
+
+                Get.offNamed(AppRouter.AGENT_MAIN_SCREEN);
               } else if ((radioButton.value == AppConstants.buyer) &&
                   (authAs == AppConstants.buyer)) {
-                buildScaffoldMessage(
+                buildScaffoldSuccessMessage(
                     context, 'Login Successful, Welcome $authName!');
                 Get.offNamed(AppRouter.BUYER_MAIN_SCREEN);
               } else {
-                buildScaffoldMessage(context, 'Invalid user type');
+                buildScaffoldErrorMessage(context, 'Invalid user type');
               }
             } else {
               isLoading.value = false;
-              buildScaffoldMessage(
+              buildScaffoldErrorMessage(
                   context, 'User data is incomplete. Please contact support.');
             }
           } else {
             isLoading.value = false;
-            buildScaffoldMessage(
+            buildScaffoldErrorMessage(
                 context, 'No user data found in Database. Please register.');
           }
         } else {
           isLoading.value = false;
-          buildScaffoldMessage(context, 'Authentication failed. Try again.');
+          buildScaffoldErrorMessage(
+              context, 'Authentication failed. Try again.');
         }
       } catch (e) {
         isLoading.value = false;
         String errorMessage = getErrorMessage(e);
-        buildScaffoldMessage(context, errorMessage);
+        buildScaffoldErrorMessage(context, errorMessage);
       }
     }
   }
-
-  // Future<void> login(BuildContext context) async {
-  //   if (await loginValidateFields(context)) {
-  //     isLoading.value = true;
-  //
-  //     String authEmailAddress = authEmailAddressController.text.trim();
-  //     String authPassword = authPasswordController.text.trim();
-  //
-  //     // Check for empty credentials
-  //     if (authEmailAddress.isEmpty || authPassword.isEmpty) {
-  //       buildScaffoldMessage(context, 'Email or Password cannot be empty');
-  //       return;
-  //     }
-  //
-  //     try {
-  //       // Perform Firebase authentication
-  //       UserCredential userCredential =
-  //           await FirebaseAuth.instance.signInWithEmailAndPassword(
-  //         email: authEmailAddress,
-  //         password: authPassword,
-  //       );
-  //
-  //       User? user = userCredential.user;
-  //       if (user != null) {
-  //         // Retrieve additional details from Firestore
-  //         DocumentSnapshot<Map<String, dynamic>> userDoc =
-  //             await FirebaseFirestore.instance
-  //                 .collection(AppConstants.collectionAuth)
-  //                 .doc(user.uid)
-  //                 .get();
-  //
-  //         if (userDoc.exists) {
-  //           // Check additional user data if needed
-  //           Map<String, dynamic>? userData = userDoc.data();
-  //
-  //           String authAs = userData?['authAs'] ?? 'User';
-  //           String authMobileNumber = userData?['authMobileNumber'] ?? 'User';
-  //
-  //           print("authAs : $authAs");
-  //           print("authMobileNumber : $authMobileNumber");
-  //
-  //           if (userData != null) {
-  //             // Successful login and data retrieval
-  //             isLoading.value = false;
-  //
-  //             buildScaffoldMessage(context,
-  //                 'Login Successful, Welcome ${userData['authName']}!');
-  //             // Navigate to the next screen
-  //             Get.offNamed(AppRouter
-  //                 .ONBOARD_VIEW); // Replace '/home' with your desired route
-  //           } else {
-  //             isLoading.value = false;
-  //             buildScaffoldMessage(
-  //                 context, 'User data is incomplete. Please contact support.');
-  //           }
-  //         } else {
-  //           isLoading.value = false;
-  //           buildScaffoldMessage(
-  //               context, 'No user data found in Database. Please register.');
-  //         }
-  //       } else {
-  //         isLoading.value = false;
-  //         buildScaffoldMessage(context, 'Authentication failed. Try again.');
-  //       }
-  //     } catch (e) {
-  //       isLoading.value = false;
-  //       // Handle errors and display appropriate messages
-  //       String errorMessage = getErrorMessage(e);
-  //       buildScaffoldMessage(context, errorMessage);
-  //     }
-  //   }
-  // }
 
   loginValidateFields(BuildContext context) async {
     String authEmailAddress = authEmailAddressController.text.trim();
     String authPassword = authPasswordController.text.trim();
 
     if (authEmailAddress.isEmpty) {
-      buildScaffoldMessage(context, 'Please enter Email Address');
+      buildScaffoldErrorMessage(context, 'Please enter Email Address');
       return false;
     } else {
       // Using EmailValidator to check general email format
       if (!EmailValidator.validate(authEmailAddress)) {
-        buildScaffoldMessage(context, 'Please enter a valid Email Address');
+        buildScaffoldErrorMessage(
+            context, 'Please enter a valid Email Address');
         return false;
       } else {
         // Additional check for Gmail domain
         if (!authEmailAddress.endsWith('@gmail.com')) {
-          buildScaffoldMessage(
+          buildScaffoldErrorMessage(
               context, 'Please enter a valid Gmail address (e.g., @gmail.com)');
           return false;
         }
       }
     }
     if (authPassword.isEmpty) {
-      buildScaffoldMessage(context, 'Please enter Password');
+      buildScaffoldErrorMessage(context, 'Please enter Password');
       return false;
     } else if (authPassword.length < 4) {
-      buildScaffoldMessage(context, 'Password atleast min 4 letters');
+      buildScaffoldErrorMessage(context, 'Password atleast min 4 letters');
       return false;
     }
 
     if (radioButton.value.isEmpty) {
-      buildScaffoldMessage(context, 'Please select (Buyer or agent)');
+      buildScaffoldErrorMessage(context, 'Please select (Buyer or agent)');
       return false;
     }
     return true;
+  }
+
+  Future<void> deleteAccount(BuildContext context) async {
+    UsersStorageService.getPassword().toString();
+    // Show confirmation dialog before deleting the account
+    Get.defaultDialog(
+      title: AppConstants.deleteAccountTitle,
+      middleText: AppConstants.deleteAccountConfirmationMessage,
+      textCancel: AppConstants.cancel,
+      textConfirm: AppConstants.confirm,
+      confirmTextColor: Colors.white,
+      onConfirm: () async {
+        try {
+          isLoading.value = true;
+
+          User? currentUser = FirebaseAuth.instance.currentUser;
+          if (currentUser != null) {
+            String userId = currentUser.uid;
+
+            // Reauthenticate the user before deletion
+            AuthCredential credential = EmailAuthProvider.credential(
+              email: currentUser.email!,
+              password: UsersStorageService.getPassword()
+                  .toString(), // Get password securely stored during login
+            );
+
+            // Reauthenticate the user
+            await currentUser.reauthenticateWithCredential(credential);
+
+            // Delete user from Firebase Authentication first
+            await currentUser.delete();
+
+            // After successful deletion from Firebase Auth, delete the user data from Firestore
+            await FirebaseFirestore.instance
+                .collection(AppConstants.collectionAuth)
+                .doc(userId)
+                .delete();
+
+            // Clear locally stored user data
+            UsersStorageService.clearUserData();
+
+            isLoading.value = false;
+            buildScaffoldSuccessMessage(
+                context, AppConstants.accountDeletedSuccess);
+
+            // Navigate to onboarding or login screen
+            Get.offAllNamed(AppRouter.LOGIN_SCREEN);
+          } else {
+            isLoading.value = false;
+            buildScaffoldErrorMessage(context, AppConstants.noUserToDelete);
+          }
+        } catch (e) {
+          isLoading.value = false;
+          buildScaffoldErrorMessage(
+              context, '${AppConstants.failedToDeleteAccount} $e');
+        }
+      },
+      onCancel: () {
+        Get.back(); // Close the dialog without deleting
+      },
+    );
   }
 }
 

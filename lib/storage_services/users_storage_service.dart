@@ -4,21 +4,21 @@ class UsersStorageService {
   static final box = GetStorage();
   //Users
   static const String userIDKey = 'user_id';
-  static const String userNameKey = 'user_id';
-  static const String userMobileNumberKey = 'user_id';
-  static const String userEmailKey = 'user_id';
-  static const String userPasswordKey = 'user_id';
-  static const String userTypeKey = 'user_id';
+  static const String userNameKey = 'user_name';
+  static const String userMobileNumberKey = 'user_mobile_number';
+  static const String userEmailKey = 'user_email';
+  static const String userPasswordKey = 'user_password';
+  static const String userTypeKey = 'user_type';
 
   static saveUser(String userId, String userName, String userMobileNumber,
-      String userEmail, String userPasswordKey, String userType) async {
+      String userEmail, String userPassword, String userType) async {
     try {
       print('Saving User Data');
       await box.write(userIDKey, userId);
       await box.write(userNameKey, userName);
       await box.write(userMobileNumberKey, userMobileNumber);
       await box.write(userEmailKey, userEmail);
-      await box.write(userPasswordKey, userPasswordKey);
+      await box.write(userPasswordKey, userPassword);
       await box.write(userTypeKey, userType);
       print('User Data saved successfully');
 
@@ -26,8 +26,12 @@ class UsersStorageService {
       print("User Name : $userName");
       print("User Mobile Number : $userMobileNumber");
       print("User Email : $userEmail");
-      print("User Password : $userPasswordKey");
+      print("User Password : $userPassword");
       print("User Type : $userType");
+
+      // print("getUserPassword");
+      // String? getUserPassword = box.read(userPasswordKey);
+      // print("Get User Password : ${getUserPassword}");
     } catch (e) {
       print('Error saving User Data: $e');
     }
@@ -40,6 +44,28 @@ class UsersStorageService {
       return userId;
     } catch (e) {
       print('Error getting UserId: $e');
+      return null;
+    }
+  }
+
+  static String? getPassword() {
+    try {
+      String? userPassword = box.read(userPasswordKey);
+      print('Getting UserPassword: $userPassword');
+      return userPassword;
+    } catch (e) {
+      print('Error getting UserPassword: $e');
+      return null;
+    }
+  }
+
+  static String? getUserName() {
+    try {
+      String? userId = box.read(userNameKey);
+      print('Getting UserName: $userId');
+      return userId;
+    } catch (e) {
+      print('Error getting UserName: $e');
       return null;
     }
   }

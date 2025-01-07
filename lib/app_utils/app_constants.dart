@@ -41,8 +41,9 @@ class AppConstants {
       "Connect with buyers interested in your property through scheduled meetings. and make selling or renting your property effortless";
   static const forSale = "For Sale";
   static const forRent = "For Rent";
-  static const individualHouse = "individual House";
+  static const individualHouseForSale = "Individual House For Sale";
   static const flatsApartments = "Flats/Apartments";
+  static const individualHouseForRent = "Individual House For Rent";
 
   static const propertyType = "Property Type";
   static const choosePropertyType = "Choose Property Type";
@@ -61,9 +62,30 @@ class AppConstants {
   static const bathrooms = "Bathrooms";
   static const noOfBathrooms = "No. of Bathrooms";
   static const price = "Price";
+
   static const additionalDetails = "Additional Details";
   static const typeHere = "Type here";
   static const done = "Done";
+  static const advance = "Advance";
+  static const rent = "Rent";
+
+  static const myHistory = "My History";
+  static const myProfile = "My Profile";
+  static const profile = "Profile";
+  static const switchToBuyer = "Switch To Buyer";
+  static const logout = "Logout";
+
+  static const noData = "No Data";
+
+  static const profileType = "Profile Type";
+  static const changePassword = "Change Password";
+  static const deleteAccount = "Delete Account";
+  static const userName = "User Name";
+
+  static const propertyDetails = "Property Details";
+
+  static const deleteMsg = "Are you sure you want to delete this sale?";
+  static const yes = "Yes";
 
   //Images
   static const vaadagaiLogoUrl =
@@ -103,12 +125,29 @@ class AppConstants {
       "https://firebasestorage.googleapis.com/v0/b/vaadagai-64012.firebasestorage.app/o/Icon_images%2Fstreet_icon.png?alt=media&token=3a3a8a25-66f1-4409-8a88-fd3153c39239";
   static const unitIconImage =
       "https://firebasestorage.googleapis.com/v0/b/vaadagai-64012.firebasestorage.app/o/Icon_images%2Funit_icon.png?alt=media&token=a3a95efd-f4cd-47cc-8c39-125ef434d67b";
+  static const dollarIconImage =
+      "https://firebasestorage.googleapis.com/v0/b/vaadagai-64012.firebasestorage.app/o/Icon_images%2Fdollar_icon.png?alt=media&token=2b6eb06c-e9e1-4d12-9419-151d8f1188bc";
+  static const logoutIconImage =
+      "https://firebasestorage.googleapis.com/v0/b/vaadagai-64012.firebasestorage.app/o/Icon_images%2Flogout_icon.png?alt=media&token=8f7330d4-6bd0-4ca9-bcf4-518e7b5de64f";
+  static const myProfileIConImage =
+      "https://firebasestorage.googleapis.com/v0/b/vaadagai-64012.firebasestorage.app/o/Icon_images%2Fmy_profile_icon.png?alt=media&token=ed7a70a5-89f1-49c4-a85a-11fc5fae26a6";
+  static const switchIconImage =
+      "https://firebasestorage.googleapis.com/v0/b/vaadagai-64012.firebasestorage.app/o/Icon_images%2Fswitch_icon.png?alt=media&token=530ba0f9-2bfa-47ef-a798-b153f3e278e8";
+  static const myHistoryIconImage =
+      "https://firebasestorage.googleapis.com/v0/b/vaadagai-64012.firebasestorage.app/o/Icon_images%2Fmy_history_icon.png?alt=media&token=44dd5408-4e08-4a91-83e5-76293a8fa7a4";
+
+  static const changePasswordIconImage =
+      "https://firebasestorage.googleapis.com/v0/b/vaadagai-64012.firebasestorage.app/o/Icon_images%2Fchange_password_icon.png?alt=media&token=4a3a0643-bd53-47cc-84a0-bad044d3c66d";
+
+  static const deleteIconImage =
+      "https://firebasestorage.googleapis.com/v0/b/vaadagai-64012.firebasestorage.app/o/Icon_images%2Fdelete_icon.png?alt=media&token=caeebfd9-767e-4048-863d-1e8ff61161a1";
 
   //firestore database
 
   static const collectionAuth = "authentication";
   static const collectionLogin = "login";
-  static const collectionForSale = "addsaleproperty";
+  static const collectionForSale = "addSaleProperty";
+  static const collectionForRent = "addRentProperty";
 
   //Scaffold messages
 
@@ -122,4 +161,15 @@ class AppConstants {
 
   static const addNewProperty = "Add New Property";
   static const addProperty = "Add Property";
+  static const updateProperty = "Update Property";
+  static const update = "Update";
+
+  static const String deleteAccountTitle = "Delete Account";
+  static const String deleteAccountConfirmationMessage =
+      "Are you sure you want to delete your account? This action cannot be undone.";
+  static const String cancel = "Cancel";
+  static const String confirm = "Confirm";
+  static const String accountDeletedSuccess = "Account deleted successfully";
+  static const String noUserToDelete = "No user found to delete.";
+  static const String failedToDeleteAccount = "Failed to delete account:";
 }

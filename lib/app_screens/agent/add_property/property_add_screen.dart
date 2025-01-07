@@ -55,7 +55,8 @@ class _PropertyAddScreenState extends State<PropertyAddScreen> {
                     borderRadius: 12,
                     onPressed: () {
                       print("For Sale clicked");
-                      Get.offNamed(AppRouter.AGENT_ADD_SALE_SCREEN);
+                      Get.toNamed(AppRouter.AGENT_ADD_SALE_SCREEN,
+                          arguments: null);
                     },
                   ),
                   buildSizedBoxHeightFun(context, height: 15),
@@ -75,7 +76,7 @@ class _PropertyAddScreenState extends State<PropertyAddScreen> {
                     borderRadius: 12,
                     onPressed: () {
                       print("For Rent clicked");
-                      Get.offNamed(AppRouter.AGENT_ADD_RENT_SCREEN);
+                      Get.toNamed(AppRouter.AGENT_ADD_RENT_SCREEN);
                     },
                   ),
                 ],

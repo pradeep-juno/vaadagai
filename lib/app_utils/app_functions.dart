@@ -1,9 +1,13 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vaadagai/app_controller/add_property_controller.dart';
+import 'package:vaadagai/app_model/sale_model.dart';
 
+import '../app_controller/agent_controller.dart';
 import '../app_controller/auth_controller.dart';
 import '../app_router/app_router.dart';
 import 'app_colors.dart';
@@ -31,13 +35,31 @@ buildSizedBoxWidthFun(BuildContext context, {required double width}) {
   );
 }
 
-buildImageFun(BuildContext context, String image,
-    {double? height, double? width}) {
-  return Image.network(
-    image,
-    height: height,
-    width: width,
-    fit: BoxFit.fitWidth,
+Widget buildImageFun(BuildContext context, String image,
+    {double? height, double? width, Color? color}) {
+  return FutureBuilder(
+    future: precacheImage(NetworkImage(image), context),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.done) {
+        return Image.network(
+          image,
+          height: height,
+          width: width,
+          fit: BoxFit.fitWidth,
+          color: color,
+        );
+      } else if (snapshot.hasError) {
+        return Icon(
+          Icons.error,
+          color: Colors.red,
+          size: 40,
+        );
+      } else {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      }
+    },
   );
 }
 
@@ -256,10 +278,15 @@ Widget buildTextFormFieldFun({
   bool isPassword = false,
   String? prefixImage,
   bool isHeightSize = true,
+  bool isMediumSize = true,
+  bool isWidthSize = true,
   bool dropdown = false,
+  bool textColors = true,
+  bool prefixColor = true,
   List<String>? dropdownItems,
   ValueChanged<String?>? onChanged,
-  RxString? selectedValue, // Add this parameter to bind the selected value
+  RxString? selectedValue,
+  double borderRadius = 32.0, // Add this parameter to bind the selected value
 }) {
   bool obscureText = isPassword;
   return Column(
@@ -271,16 +298,20 @@ Widget buildTextFormFieldFun({
         text,
         fontSize: 16,
         fontWeight: FontWeight.w500,
-        color: Colors.black,
+        color: textColors ? Colors.black : AppColors.orange,
       ),
       buildSizedBoxHeightFun(context, height: 6),
       StatefulBuilder(
         builder: (context, setState) {
           return Container(
-            height: isHeightSize ? 56 : 194,
-            width: 343,
+            height: isHeightSize
+                ? 56
+                : isMediumSize
+                    ? 194
+                    : 40,
+            width: isWidthSize ? 343 : 166,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(32.0),
+              borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(color: Colors.grey),
             ),
             child: dropdown
@@ -350,7 +381,11 @@ Widget buildTextFormFieldFun({
                           ? Padding(
                               padding: const EdgeInsets.all(12.0),
                               child: buildImageFun(context, prefixImage,
-                                  height: 20, width: 20),
+                                  height: 20,
+                                  width: 20,
+                                  color: prefixColor
+                                      ? AppColors.black
+                                      : AppColors.orange),
                             )
                           : null,
                       suffixIcon: isPassword
@@ -380,19 +415,104 @@ Widget buildTextFormFieldFun({
   );
 }
 
-void buildScaffoldMessage(BuildContext context, String message) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(
-        message,
-        style: TextStyle(
-          fontSize: 12,
-          color: Colors.red,
-          fontWeight: FontWeight.bold,
+void buildScaffoldSuccessMessage(BuildContext context, String message) {
+  final overlay = Overlay.of(context);
+  final overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      top: 50.0,
+      left: 20.0,
+      right: 20.0,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            color: Colors.green,
+            borderRadius: BorderRadius.circular(8.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 4.0,
+                spreadRadius: 1.0,
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.check_circle,
+                color: Colors.white,
+                size: 20,
+              ),
+              SizedBox(width: 10), // Spacing between icon and text
+              Expanded(
+                child: buildTextFun(context, message,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.backgroundWhite),
+              ),
+            ],
+          ),
         ),
       ),
-      duration: Duration(seconds: 2),
-      backgroundColor: Colors.yellowAccent,
-      behavior: SnackBarBehavior.floating));
+    ),
+  );
+
+  overlay.insert(overlayEntry);
+
+  Future.delayed(Duration(seconds: 2), () {
+    overlayEntry.remove();
+  });
+}
+
+void buildScaffoldErrorMessage(BuildContext context, String message) {
+  final overlay = Overlay.of(context);
+  final overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      top: 50.0,
+      left: 20.0,
+      right: 20.0,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            color: Colors.red,
+            borderRadius: BorderRadius.circular(8.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 4.0,
+                spreadRadius: 1.0,
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.error,
+                color: Colors.white,
+                size: 20,
+              ),
+              SizedBox(width: 10), // Spacing between icon and text
+              Expanded(
+                child: buildTextFun(context, message,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.backgroundWhite),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  overlay.insert(overlayEntry);
+
+  Future.delayed(Duration(seconds: 2), () {
+    overlayEntry.remove();
+  });
 }
 
 //------------------Login Functions-------------------//
@@ -409,7 +529,7 @@ buildLoginButtonFun(BuildContext context, AuthController authController) {
 
         authController.login(context);
       }),
-      buildSizedBoxHeightFun(context, height: 5),
+      buildSizedBoxHeightFun(context, height: 10),
       buildTextFun(
         context,
         AppConstants.dontHaveAccountRegister,
@@ -420,7 +540,7 @@ buildLoginButtonFun(BuildContext context, AuthController authController) {
         // This will make the text clickable
         onTap: () {
           print('Dont HaveAccountRegister Text clicked!');
-          Get.offNamed(AppRouter.REGISTER_SCREEN);
+          Get.toNamed(AppRouter.REGISTER_SCREEN);
         },
       )
     ],
@@ -562,7 +682,7 @@ buildRegisterButtonFun(BuildContext context, AuthController authController) {
           // This will make the text clickable
           onTap: () {
             print('Dont HaveAccountRegister Text clicked!');
-            Get.offNamed(AppRouter.LOGIN_SCREEN);
+            Get.toNamed(AppRouter.LOGIN_SCREEN);
           },
         )
       ],
@@ -695,7 +815,7 @@ buildTopLogoFun(BuildContext context, String imageUrl,
 
 //----------------------------------ADD SALE-----------------------------//
 
-buildAgentAddSaleHeaderFun(BuildContext context, String addProperty) {
+buildAgentHeaderFun(BuildContext context, String addProperty) {
   return Column(
     crossAxisAlignment:
         CrossAxisAlignment.start, // Aligns children to the start
@@ -709,7 +829,8 @@ buildAgentAddSaleHeaderFun(BuildContext context, String addProperty) {
             GestureDetector(
               onTap: () {
                 print('property add screen click');
-                Get.offNamed(AppRouter.PROPERTY_ADD_SCREEN);
+                Get.back();
+                // Get.toNamed(AppRouter.PROPERTY_ADD_SCREEN);
               },
               child: const Icon(Icons.arrow_back),
             ),
@@ -742,7 +863,7 @@ buildAgentAddSaleBodyFun(
             text: AppConstants.propertyType,
             hintText: AppConstants.choosePropertyType,
             dropdown: true,
-            dropdownItems: addPropertyController.propertyTypeItems,
+            dropdownItems: addPropertyController.propertyTypeItemsForSale,
             selectedValue: addPropertyController.selectedPropertyType,
             onChanged: (value) {
               print("Selected value: $value");
@@ -757,6 +878,7 @@ buildAgentAddSaleBodyFun(
               controller: addPropertyController.addPostalCodeController,
               isSmallSize: false,
               prefixImage: AppConstants.hashtagIconImage,
+              keyboardType: TextInputType.phone,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(10),
@@ -767,7 +889,7 @@ buildAgentAddSaleBodyFun(
               text: AppConstants.unit,
               hintText: AppConstants.enterUnit,
               controller: addPropertyController.addUnitController,
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: TextInputType.phone,
               isSmallSize: false,
               prefixImage: AppConstants.unitIconImage,
               inputFormatters: [
@@ -791,6 +913,7 @@ buildAgentAddSaleBodyFun(
               controller: addPropertyController.addTotalFloorsController,
               isSmallSize: false,
               prefixImage: AppConstants.floorIconImage,
+              keyboardType: TextInputType.phone,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(3),
@@ -803,6 +926,7 @@ buildAgentAddSaleBodyFun(
               controller: addPropertyController.addFloorNoController,
               isSmallSize: false,
               prefixImage: AppConstants.floorIconImage,
+              keyboardType: TextInputType.phone,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(4),
@@ -815,6 +939,7 @@ buildAgentAddSaleBodyFun(
               controller: addPropertyController.addSqftController,
               isSmallSize: false,
               prefixImage: AppConstants.sqftIconImage,
+              keyboardType: TextInputType.phone,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(5),
@@ -827,6 +952,7 @@ buildAgentAddSaleBodyFun(
               controller: addPropertyController.addBhkController,
               isSmallSize: false,
               prefixImage: AppConstants.bhkIconImage,
+              keyboardType: TextInputType.phone,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(2),
@@ -839,6 +965,7 @@ buildAgentAddSaleBodyFun(
               controller: addPropertyController.addBathroomsController,
               isSmallSize: false,
               prefixImage: AppConstants.bathroomIconImage,
+              keyboardType: TextInputType.phone,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(2),
@@ -851,6 +978,7 @@ buildAgentAddSaleBodyFun(
               controller: addPropertyController.addPriceController,
               isSmallSize: false,
               prefixImage: AppConstants.pricetagIconImage,
+              keyboardType: TextInputType.phone,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,
                 LengthLimitingTextInputFormatter(10),
@@ -869,7 +997,222 @@ buildAgentAddSaleBodyFun(
   }
 }
 
-buildAgentAddSaleButtonFun(
+buildAgentAddSaleButtonFun(BuildContext context,
+    AddPropertyController addPropertyController, SaleModel? saleModel) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Obx(() {
+          return buildContainerButtonFun(
+            context,
+            addPropertyController.isSaleEditId.value
+                ? AppConstants.update
+                : AppConstants.done,
+            fontSize: 16,
+            height: 50,
+            width: MediaQuery.of(context).size.width,
+            fontWeight: FontWeight.w500,
+            color: AppColors.orange,
+            onPressed: () {
+              if (addPropertyController.isSaleEditId.value) {
+                // Update operation
+                print('Update button clicked!');
+                // addPropertyController.updateSaleProperty(context);
+              } else {
+                // Add operation
+                print('Add button clicked!');
+                addPropertyController.addSaleProperty(context);
+              }
+            },
+          );
+        }),
+      ],
+    ),
+  );
+}
+
+//-------------------  add rent property  ----------------------//
+
+buildAgentAddRentBodyFun(
+  context,
+  AddPropertyController addPropertyController,
+) {
+  {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          buildTextFormFieldFun(
+            context: context,
+            text: AppConstants.propertyType,
+            hintText: AppConstants.choosePropertyType,
+            dropdown: true,
+            dropdownItems: addPropertyController.propertyTypeItemsForRent,
+            selectedValue: addPropertyController.selectedPropertyType,
+            onChanged: (value) {
+              print("Selected value: $value");
+            },
+            prefixImage: AppConstants.propertytypeIconImage,
+          ),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.postalCode,
+              hintText: AppConstants.enterPostalCode,
+              controller: addPropertyController.addPostalCodeController,
+              isSmallSize: false,
+              prefixImage: AppConstants.hashtagIconImage,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.unit,
+              hintText: AppConstants.enterUnit,
+              controller: addPropertyController.addUnitController,
+              isSmallSize: false,
+              prefixImage: AppConstants.unitIconImage,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(4),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+            context: context,
+            text: AppConstants.street,
+            hintText: AppConstants.enterTheStreet,
+            controller: addPropertyController.addStreetController,
+            isSmallSize: false,
+            prefixImage: AppConstants.streetIconImage,
+          ),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.floorNo,
+              hintText: AppConstants.floorNo,
+              controller: addPropertyController.addFloorNoController,
+              isSmallSize: false,
+              prefixImage: AppConstants.floorIconImage,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(4),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.builtUpAreaSqft,
+              hintText: AppConstants.sqFt,
+              controller: addPropertyController.addSqftController,
+              isSmallSize: false,
+              prefixImage: AppConstants.sqftIconImage,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(5),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.bhk,
+              hintText: AppConstants.enterBhk,
+              controller: addPropertyController.addBhkController,
+              isSmallSize: false,
+              prefixImage: AppConstants.bhkIconImage,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(2),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.bathrooms,
+              hintText: AppConstants.noOfBathrooms,
+              controller: addPropertyController.addBathroomsController,
+              isSmallSize: false,
+              prefixImage: AppConstants.bathroomIconImage,
+              keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(2),
+              ]),
+          buildSizedBoxHeightFun(context, height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                buildTextFun(context, AppConstants.price,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.black),
+                buildSizedBoxHeightFun(context, height: 5),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      buildTextFormFieldFun(
+                          context: context,
+                          text: AppConstants.advance,
+                          hintText: '',
+                          prefixImage: AppConstants.dollarIconImage,
+                          controller:
+                              addPropertyController.addAdvanceController,
+                          isMediumSize: false,
+                          isHeightSize: true,
+                          isWidthSize: false,
+                          textColors: false,
+                          prefixColor: false,
+                          keyboardType: TextInputType.phone,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(12),
+                          ]),
+                      buildSizedBoxWidthFun(context, width: 5),
+                      buildTextFormFieldFun(
+                          context: context,
+                          text: AppConstants.rent,
+                          hintText: '',
+                          prefixImage: AppConstants.dollarIconImage,
+                          isMediumSize: false,
+                          controller: addPropertyController.addRentController,
+                          isHeightSize: true,
+                          isWidthSize: false,
+                          textColors: false,
+                          prefixColor: false,
+                          keyboardType: TextInputType.phone,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(10),
+                          ]),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          buildSizedBoxHeightFun(context, height: 20),
+          buildTextFormFieldFun(
+              context: context,
+              text: AppConstants.additionalDetails,
+              hintText: AppConstants.typeHere,
+              controller: addPropertyController.addAdditionalDetailsController,
+              isSmallSize: false,
+              isHeightSize: false),
+        ],
+      ),
+    );
+  }
+}
+
+buildAgentAddRentButtonFun(
     BuildContext context, AddPropertyController addPropertyController) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -882,8 +1225,8 @@ buildAgentAddSaleButtonFun(
             width: MediaQuery.of(context).size.width,
             fontWeight: FontWeight.w500,
             color: AppColors.orange, onPressed: () {
-          print('Register button clicked!');
-          addPropertyController.addProperty(context);
+          print('Done button clicked!');
+          addPropertyController.addRentProperty(context);
         }),
       ],
     ),
@@ -896,5 +1239,456 @@ Widget loadingProgress(BuildContext context) {
       backgroundColor: AppColors.primaryBlue,
       color: AppColors.white,
     ),
+  );
+}
+
+void logout(BuildContext context) {
+  Get.dialog(
+    Stack(
+      children: [
+        // Blurred Background
+        BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+          child: Container(
+            color: Colors.black
+                .withOpacity(0.5), // Optional: Add a semi-transparent overlay
+          ),
+        ),
+
+        // Dialog Box
+        Center(
+          child: AlertDialog(
+            contentPadding: EdgeInsets.all(20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            title: Center(
+              child: Text(
+                'Want to Logout?',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Tick Icon Container for confirming logout
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color:
+                          AppColors.primaryBlue, // Border color for tick icon
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.check),
+                    color: AppColors.primaryBlue,
+                    onPressed: () {
+                      Get.find<AgentController>().selectedIndex.value = 0;
+
+                      Get.toNamed(
+                        AppRouter.LOGIN_SCREEN,
+                      );
+                      buildScaffoldSuccessMessage(
+                          context, "Logged Out Successfully");
+                    },
+                  ),
+                ),
+
+                SizedBox(width: 20), // Space between icons
+
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.orange, // Background color for close icon
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.close),
+                    color: Colors.white,
+                    onPressed: () {
+                      Get.back();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+    barrierColor: Colors
+        .transparent, // Ensure background is fully visible for blur effect
+  );
+}
+
+Widget buildSaleFetchContainerFun(
+  BuildContext context,
+  AddPropertyController addPropertyController,
+) {
+  print("buildFetchContainerFun started....");
+
+  final ScrollController fetchScrollController = ScrollController();
+
+  return Obx(() {
+    // Check loading state first
+    if (addPropertyController.isLoading.value) {
+      return loadingProgress(context); // Show loading indicator
+    }
+
+    // Check if the list is empty
+    if (addPropertyController.saleList.isEmpty) {
+      return Center(
+        child: buildTextFun(
+          context,
+          AppConstants.noData,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+      );
+    }
+
+    // If data is available, show the list
+    return Scrollbar(
+      thumbVisibility: true,
+      controller: fetchScrollController,
+      child: ListView.builder(
+        controller: fetchScrollController,
+        itemCount: addPropertyController.saleList.length,
+        itemBuilder: (context, index) {
+          final sale = addPropertyController.saleList[index];
+
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: InkWell(
+              onTap: () {
+                print("Sale ID : ${sale.saleId}");
+                Get.toNamed(
+                  AppRouter.AGENT_SALE_DETAIL_SCREEN,
+                  arguments: sale,
+                );
+              },
+              child: Container(
+                height: 200,
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey,
+                    width: 2.0,
+                  ),
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildTextFun(
+                        context,
+                        sale.addPropertyType,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.black,
+                      ),
+                      buildSizedBoxHeightFun(context, height: 8),
+                      buildTextFun(
+                        context,
+                        'Area: ${sale.addSqft}',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.black,
+                      ),
+                      buildSizedBoxHeightFun(context, height: 8),
+                      buildTextFun(
+                        context,
+                        '\$${sale.addPrice}',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.black,
+                      ),
+                      buildSizedBoxHeightFun(context, height: 8),
+                      Row(
+                        children: [
+                          Icon(Icons.location_on,
+                              color: Colors.red, size: 18.0),
+                          buildSizedBoxWidthFun(context, width: 4),
+                          Expanded(
+                            child: buildTextFun(
+                              context,
+                              sale.addStreet,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                      buildSizedBoxHeightFun(context, height: 8),
+                      Row(
+                        children: [
+                          Icon(Icons.calendar_today,
+                              color: Colors.red, size: 18.0),
+                          buildSizedBoxWidthFun(context, width: 4),
+                          buildTextFun(
+                            context,
+                            getTimeDifference(sale.addSaleCreatedAt),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.black,
+                          ),
+                        ],
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: buildTextFun(
+                          context,
+                          'View Details >>',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.orange,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  });
+}
+
+Widget buildRentFetchContainerFun(
+  BuildContext context,
+  AddPropertyController addPropertyController,
+) {
+  print("buildFetchContainerFun started....");
+
+  final ScrollController fetchScrollController = ScrollController();
+
+  if (addPropertyController.rentList.isEmpty) {
+    return Center(
+      child: buildTextFun(context, AppConstants.noData,
+          fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+    );
+  }
+
+  return Scrollbar(
+      thumbVisibility: true,
+      controller: fetchScrollController,
+      child: Obx(() {
+        return ListView.builder(
+          controller: fetchScrollController,
+          itemCount: addPropertyController.rentList.length,
+          itemBuilder: (context, index) {
+            final sale = addPropertyController.rentList[index];
+
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                height: 220,
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey,
+                    width: 2.0,
+                  ),
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    buildTextFun(context, sale.addPropertyType,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.black),
+                    buildSizedBoxHeightFun(context, height: 8),
+                    buildTextFun(context, 'Area: ${sale.addSqft}',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.black),
+                    buildSizedBoxHeightFun(context, height: 8),
+                    // buildTextFun(context, '\$${sale.addPrice}',
+                    //     fontSize: 20,
+                    //     fontWeight: FontWeight.bold,
+                    //     color: AppColors.black),
+                    buildSizedBoxHeightFun(context, height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.location_on, color: Colors.red, size: 18.0),
+                        buildSizedBoxWidthFun(context, width: 4),
+                        Expanded(
+                          child: buildTextFun(
+                            context,
+                            sale.addStreet,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                    buildSizedBoxHeightFun(context, height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.calendar_today,
+                            color: Colors.red, size: 18.0),
+                        buildSizedBoxWidthFun(context, width: 4),
+                        buildTextFun(
+                            context, getTimeDifference(sale.addRentCreatedAt),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.black),
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: buildTextFun(context, 'View Details >>',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.orange),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      }));
+}
+
+String getTimeDifference(DateTime postTime) {
+  final now = DateTime.now(); // current time
+  final difference = now.difference(postTime); // post time = past time
+
+  if (difference.inMinutes < 1) {
+    return 'Just now'; // For less than a minute
+  } else if (difference.inMinutes < 60) {
+    return '${difference.inMinutes} min';
+  } else if (difference.inHours < 24) {
+    return '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''}';
+  } else if (difference.inDays < 30) {
+    return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''}';
+  } else if (difference.inDays < 365) {
+    final months = (difference.inDays / 30).floor();
+    return '$months month${months > 1 ? 's' : ''}';
+  } else {
+    final years = (difference.inDays / 365).floor();
+    return '$years year${years > 1 ? 's' : ''}';
+  }
+}
+
+buildProfileHeaderFun(
+    BuildContext context, String profile, AgentController controller) {
+  return Column(
+    crossAxisAlignment:
+        CrossAxisAlignment.start, // Aligns children to the start
+    children: [
+      buildTopLogoFun(context, AppConstants.vaadagaiLogoUrl),
+      buildSizedBoxHeightFun(context, height: 16),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                print('profile screen click');
+
+                controller.selectedIndex.value = 2;
+                Get.toNamed(AppRouter.AGENT_MAIN_SCREEN, arguments: 2);
+              },
+              child: const Icon(Icons.arrow_back),
+            ),
+            const SizedBox(width: 8), // Adds spacing between the icon and text
+            buildTextFun(
+              context,
+              profile,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: AppColors.black,
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget buildPropertyDetailsHeaderFun(
+  BuildContext context,
+  String profile,
+  SaleModel? saleModel,
+  AddPropertyController addPropertyController,
+) {
+  return Column(
+    crossAxisAlignment:
+        CrossAxisAlignment.start, // Aligns children to the start
+    children: [
+      buildTopLogoFun(context, AppConstants.vaadagaiLogoUrl),
+      buildSizedBoxHeightFun(context, height: 16),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                print('Property Details screen click');
+                Get.toNamed(AppRouter.AGENT_MAIN_SCREEN);
+              },
+              child: const Icon(Icons.arrow_back),
+            ),
+            const SizedBox(width: 8), // Adds spacing between the icon and text
+            buildTextFun(
+              context,
+              profile,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: AppColors.black,
+            ),
+            const Spacer(), // Pushes the buttons to the right side
+            IconButton(
+              onPressed: () {
+                print('Edit button clicked');
+                print("Property SaleId: ${saleModel?.saleId} ");
+                Get.toNamed(AppRouter.AGENT_ADD_SALE_SCREEN,
+                    arguments: saleModel);
+              },
+              icon: const Icon(Icons.edit, color: Colors.red),
+            ),
+            IconButton(
+              onPressed: () {
+                Get.defaultDialog(
+                  title: '',
+                  middleText: AppConstants.deleteMsg,
+                  textConfirm: AppConstants.yes,
+                  textCancel: AppConstants.cancel,
+                  confirmTextColor: Colors.white,
+                  onConfirm: () {
+                    // Call deleteSaleData and pass the saleId
+                    addPropertyController.deleteSaleData(
+                        context, saleModel!.saleId);
+
+                    Get.back(); // Close the dialog
+                  },
+                  onCancel: () {
+                    Get.back(); // Close the dialog
+                  },
+                );
+              },
+              icon: const Icon(Icons.delete, color: Colors.red),
+            ),
+          ],
+        ),
+      ),
+    ],
   );
 }

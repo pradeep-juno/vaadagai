@@ -37,6 +37,10 @@ class _SplashScreenState extends State<SplashScreen> {
       Map<String, dynamic>? userData = userDoc.data();
 
       if (userData != null) {
+        String? localUserId = UsersStorageService.getUserId();
+
+        print("SplashScreen -> userId : $localUserId");
+
         String authAs = userData['authAs'] ?? 'User';
 
         print("SplashScreen -> authAs : $authAs");
@@ -55,11 +59,11 @@ class _SplashScreenState extends State<SplashScreen> {
           Get.offNamed(AppRouter.BUYER_MAIN_SCREEN);
         }
       } else {
-        buildScaffoldMessage(
+        buildScaffoldErrorMessage(
             context, 'User data is incomplete. Please contact support.');
       }
     } else {
-      buildScaffoldMessage(context, 'No user data found in Database.');
+      Get.offNamed(AppRouter.LOGIN_SCREEN);
     }
   }
 
