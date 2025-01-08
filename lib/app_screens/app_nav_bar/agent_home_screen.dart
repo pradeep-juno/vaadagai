@@ -25,15 +25,21 @@ class _AgentHomeScreenState extends State<AgentHomeScreen>
   void initState() {
     super.initState();
 
+    final args = Get.arguments as Map<String, dynamic>? ?? {};
+    final initialTabIndex = args['tabIndex'] ?? 0;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       addPropertyController.fetchSale();
 
       print("addSaleCreatedAt23 : ${addPropertyController.addSaleCreatedAt}");
 
       addPropertyController.fetchRent();
+      print("addRentCreatedAt23 : ${addPropertyController.addRentCreatedAt}");
     });
-    _tabController =
-        TabController(length: 2, vsync: this); // Two tabs: Sale and Rent
+    _tabController = TabController(
+        length: 2,
+        vsync: this,
+        initialIndex: initialTabIndex); // Two tabs: Sale and Rent
   }
 
   @override
@@ -84,8 +90,8 @@ class _AgentHomeScreenState extends State<AgentHomeScreen>
                           ),
                           unselectedLabelColor: Colors.grey[500],
                           tabs: const [
-                            Tab(text: 'Sale'),
-                            Tab(text: 'Rent'),
+                            Tab(text: AppConstants.sale),
+                            Tab(text: AppConstants.rent),
                           ],
                         ),
                         buildSizedBoxHeightFun(context, height: 10),
@@ -124,7 +130,7 @@ class _AgentHomeScreenState extends State<AgentHomeScreen>
                 color: AppColors.backgroundWhite,
                 onPressed: () {
                   print('Add new property button clicked!');
-                  Get.offNamed(AppRouter.PROPERTY_ADD_SCREEN);
+                  Get.toNamed(AppRouter.PROPERTY_ADD_SCREEN);
                 },
                 height: 48,
                 width: 220,

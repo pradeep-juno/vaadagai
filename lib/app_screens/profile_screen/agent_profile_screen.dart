@@ -36,7 +36,11 @@ class _AgentProfileScreenState extends State<AgentProfileScreen> {
           children: [
             Column(
               children: [
-                buildProfileHeaderFun(context, '', controller),
+                buildProfileHeaderFun(
+                  context,
+                  '',
+                ),
+                // buildProfileHeaderFun(context, '', controller)
                 buildSizedBoxHeightFun(context, height: 12),
                 buildUserProfile(
                     context, userProfileController, authController),
@@ -131,7 +135,18 @@ buildUserProfile(
             fontSize: 16,
             fontWeight: FontWeight.w500,
             textColor: AppColors.black,
-            onTap: () {},
+            onTap: () {
+              Get.defaultDialog(
+                title: AppConstants.delete,
+                middleText: AppConstants.deleteMsg,
+                textConfirm: AppConstants.yes,
+                textCancel: AppConstants.cancel,
+                confirmTextColor: Colors.white,
+                onConfirm: () {
+                  logout(context);
+                },
+              );
+            },
           ),
         ],
       ),

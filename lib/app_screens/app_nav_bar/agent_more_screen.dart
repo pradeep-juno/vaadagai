@@ -53,7 +53,8 @@ class _AgentMoreScreenState extends State<AgentMoreScreen> {
                       fontWeight: FontWeight.w500,
                       textColor: AppColors.black,
                       onTap: () {
-                        Get.offNamed(AppRouter.AGENT_PROFILE_SCREEN);
+                        print("my profile clicked");
+                        Get.toNamed(AppRouter.AGENT_PROFILE_SCREEN);
                       },
                     ),
                     const Divider(),
@@ -69,18 +70,6 @@ class _AgentMoreScreenState extends State<AgentMoreScreen> {
                     ),
                     const Divider(),
                     buildSizedBoxHeightFun(context, height: 20),
-                    buildIconTextFunction(
-                      context,
-                      image: AppConstants.logoutIconImage,
-                      text: AppConstants.logout,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      textColor: AppColors.black,
-                      onTap: () {
-                        logout(context);
-                      },
-                    ),
-                    const Divider(),
                   ],
                 ),
               ),

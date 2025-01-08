@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:vaadagai/app_screens/agent/add_property/agent_add_rent_screen.dart';
 import 'package:vaadagai/app_screens/agent/add_property/agent_add_sale_screen.dart';
+import 'package:vaadagai/app_screens/agent/add_property/agent_rent_detail_screen.dart';
 import 'package:vaadagai/app_screens/agent/add_property/property_add_screen.dart';
 import 'package:vaadagai/app_screens/app_nav_bar/agent_main_screen.dart';
 import 'package:vaadagai/app_screens/app_nav_bar/agent_more_screen.dart';
@@ -34,7 +35,7 @@ class AppRouter {
   static const AGENT_PROFILE_SCREEN = '/agent-profile-screen';
 
   static const AGENT_SALE_DETAIL_SCREEN = '/agent-sale-detail-screen';
-
+  static const AGENT_RENT_DETAIL_SCREEN = '/agent-rent-detail-screen';
   //buyer
 
   static const BUYER_MAIN_SCREEN = '/buyer-main-screen';
@@ -103,6 +104,10 @@ class AppRouter {
     GetPage(
       name: AGENT_SALE_DETAIL_SCREEN,
       page: () => AgentSaleDetailScreen(),
+    ),
+    GetPage(
+      name: AGENT_RENT_DETAIL_SCREEN,
+      page: () => AgentRentDetailScreen(),
     ),
   ];
 }

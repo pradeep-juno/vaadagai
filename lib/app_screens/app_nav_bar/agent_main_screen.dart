@@ -26,10 +26,8 @@ class _AgentMainScreenState extends State<AgentMainScreen> {
     // TODO: implement initState
     super.initState();
     setState(() {
-      int initialIndex = Get.arguments ?? 0;
-
-      // Set the selectedIndex to the value passed in arguments
-      controller.selectedIndex.value = initialIndex;
+      // int initialIndex = Get.arguments ?? 0;
+      // controller.selectedIndex.value = initialIndex;
       String userId = UsersStorageService.getUserId().toString();
       print("AGENT_MAIN_SCREEN : USER_ID => $userId");
     });

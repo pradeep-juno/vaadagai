@@ -88,6 +88,8 @@ class AppConstants {
   static const yes = "Yes";
   static const delete = "Delete Confirmation";
 
+  static const sale = "Sale";
+
   //Images
   static const vaadagaiLogoUrl =
       "https://firebasestorage.googleapis.com/v0/b/vaadagai-64012.firebasestorage.app/o/Vaadagai_Source%2Fvaadagai_logo.png?alt=media&token=7059589e-7ca8-4579-ad76-ea12afecd914";

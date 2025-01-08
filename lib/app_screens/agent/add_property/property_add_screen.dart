@@ -18,73 +18,59 @@ class _PropertyAddScreenState extends State<PropertyAddScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Column(
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            buildTopLogoFun(context, AppConstants.vaadagaiLogoUrl),
-            buildSizedBoxHeightFun(context, height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  buildTextFun(
-                    context,
-                    AppConstants.addProperty,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.black,
-                    prefixIcon: const Icon(Icons.arrow_back),
-                    onIconTap: () {
-                      Get.offNamed(AppRouter.AGENT_MAIN_SCREEN);
-                    },
-                  ),
-                  buildSizedBoxHeightFun(context, height: 20),
-                  // "For Sale" button
-                  buildContainerButtonFun(
-                    context,
-                    AppConstants.forSale,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    height: 50,
-                    width: double.infinity,
-                    circle: true,
-                    circleTextColor: AppColors.black,
-                    circleColor: AppColors.lightGrey,
-                    centerText: false,
-                    borderRadius: 12,
-                    onPressed: () {
-                      print("For Sale clicked");
-                      Get.toNamed(AppRouter.AGENT_ADD_SALE_SCREEN,
-                          arguments: null);
-                    },
-                  ),
-                  buildSizedBoxHeightFun(context, height: 15),
-                  // "For Rent" button
-                  buildContainerButtonFun(
-                    context,
-                    AppConstants.forRent,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    height: 50,
-                    width: double.infinity,
-                    circle: true,
-                    fontColor: Colors.black,
-                    circleColor: AppColors.lightGrey,
-                    circleTextColor: AppColors.black,
-                    centerText: false,
-                    borderRadius: 12,
-                    onPressed: () {
-                      print("For Rent clicked");
-                      Get.toNamed(AppRouter.AGENT_ADD_RENT_SCREEN);
-                    },
-                  ),
-                ],
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildPropertyAddHeaderFun(context, AppConstants.addProperty),
+              buildSizedBoxHeightFun(context, height: 20),
+              // "For Sale" button
+              buildContainerButtonFun(
+                context,
+                AppConstants.forSale,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                height: 50,
+                width: double.infinity,
+                circle: true,
+                circleTextColor: AppColors.black,
+                circleColor: AppColors.lightGrey,
+                centerText: false,
+                borderRadius: 12,
+                onPressed: () {
+                  print("For Sale clicked");
+                  Get.toNamed(AppRouter.AGENT_ADD_SALE_SCREEN, arguments: null);
+                },
               ),
-            ),
-          ],
+              buildSizedBoxHeightFun(context, height: 15),
+              // "For Rent" button
+              buildContainerButtonFun(
+                context,
+                AppConstants.forRent,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                height: 50,
+                width: double.infinity,
+                circle: true,
+                fontColor: Colors.black,
+                circleColor: AppColors.lightGrey,
+                circleTextColor: AppColors.black,
+                centerText: false,
+                borderRadius: 12,
+                onPressed: () {
+                  print("For Rent clicked");
+                  Get.toNamed(AppRouter.AGENT_ADD_RENT_SCREEN, arguments: null);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+}
+
+Future<void> goBack() async {
+  Get.back();
 }

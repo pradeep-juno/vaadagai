@@ -9,6 +9,7 @@ import 'package:vaadagai/app_model/sale_model.dart';
 
 import '../app_controller/agent_controller.dart';
 import '../app_controller/auth_controller.dart';
+import '../app_model/rent_model.dart';
 import '../app_router/app_router.dart';
 import 'app_colors.dart';
 import 'app_constants.dart';
@@ -830,7 +831,6 @@ buildAgentHeaderFun(BuildContext context, String addProperty) {
               onTap: () {
                 print('property add screen click');
                 Get.back();
-                // Get.toNamed(AppRouter.PROPERTY_ADD_SCREEN);
               },
               child: const Icon(Icons.arrow_back),
             ),
@@ -997,6 +997,7 @@ buildAgentAddSaleBodyFun(
   }
 }
 
+//--------------------Agent_Sale_Button_Function--------------------//
 buildAgentAddSaleButtonFun(BuildContext context,
     AddPropertyController addPropertyController, SaleModel? saleModel) {
   return Padding(
@@ -1215,22 +1216,41 @@ buildAgentAddRentBodyFun(
   }
 }
 
-buildAgentAddRentButtonFun(
-    BuildContext context, AddPropertyController addPropertyController) {
+//---------------------------Agent_Rent_Button_Function-----------------//
+buildAgentAddRentButtonFun(BuildContext context,
+    AddPropertyController addPropertyController, RentModel? rentModel) {
   return Padding(
     padding: const EdgeInsets.symmetric(horizontal: 0),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        buildContainerButtonFun(context, AppConstants.done,
-            fontSize: 16,
-            height: 50,
-            width: MediaQuery.of(context).size.width,
-            fontWeight: FontWeight.w500,
-            color: AppColors.orange, onPressed: () {
-          print('Done button clicked!');
-          addPropertyController.addRentProperty(context);
-        }),
+        Obx(() {
+          return buildContainerButtonFun(
+              context,
+              addPropertyController.isRentEditId.value
+                  ? AppConstants.update
+                  : AppConstants.done,
+              fontSize: 16,
+              height: 50,
+              width: MediaQuery.of(context).size.width,
+              fontWeight: FontWeight.w500,
+              color: AppColors.orange, onPressed: () {
+            print('Done button clicked!');
+            // addPropertyController.addRentProperty(context);
+            if (addPropertyController.isRentEditId.value) {
+              // Update operation
+              print('Update button clicked!');
+              addPropertyController.addUpdateRentProperty(context,
+                  updateRentId: rentModel!.rentId,
+                  createdAt: rentModel!.addRentCreatedAt);
+              // addPropertyController.updateSaleProperty(context);
+            } else {
+              // Add operation
+              print('Add button clicked!');
+              addPropertyController.addUpdateRentProperty(context);
+            }
+          });
+        })
       ],
     ),
   );
@@ -1404,7 +1424,7 @@ Widget buildSaleFetchContainerFun(
                       buildSizedBoxHeightFun(context, height: 8),
                       buildTextFun(
                         context,
-                        '\$${sale.addPrice}',
+                        '₹${sale.addPrice}',
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: AppColors.black,
@@ -1471,97 +1491,113 @@ Widget buildRentFetchContainerFun(
 
   final ScrollController fetchScrollController = ScrollController();
 
-  if (addPropertyController.rentList.isEmpty) {
-    return Center(
-      child: buildTextFun(context, AppConstants.noData,
-          fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
-    );
-  }
+  return Obx(() {
+    if (addPropertyController.isLoading.value) {
+      return loadingProgress(context); // Show loading indicator
+    }
 
-  return Scrollbar(
-      thumbVisibility: true,
-      controller: fetchScrollController,
-      child: Obx(() {
-        return ListView.builder(
-          controller: fetchScrollController,
-          itemCount: addPropertyController.rentList.length,
-          itemBuilder: (context, index) {
-            final sale = addPropertyController.rentList[index];
+    if (addPropertyController.rentList.isEmpty) {
+      return Center(
+        child: buildTextFun(context, AppConstants.noData,
+            fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
+      );
+    }
 
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 220,
-                width: MediaQuery.of(context).size.width,
-                padding: const EdgeInsets.all(12.0),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.grey,
-                    width: 2.0,
-                  ),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    buildTextFun(context, sale.addPropertyType,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.black),
-                    buildSizedBoxHeightFun(context, height: 8),
-                    buildTextFun(context, 'Area: ${sale.addSqft}',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.black),
-                    buildSizedBoxHeightFun(context, height: 8),
-                    // buildTextFun(context, '\$${sale.addPrice}',
-                    //     fontSize: 20,
-                    //     fontWeight: FontWeight.bold,
-                    //     color: AppColors.black),
-                    buildSizedBoxHeightFun(context, height: 8),
-                    Row(
+    return Scrollbar(
+        thumbVisibility: true,
+        controller: fetchScrollController,
+        child: Obx(() {
+          return ListView.builder(
+            controller: fetchScrollController,
+            itemCount: addPropertyController.rentList.length,
+            itemBuilder: (context, index) {
+              final rent = addPropertyController.rentList[index];
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InkWell(
+                  onTap: () {
+                    print("Rent ID : ${rent.rentId}");
+                    Get.toNamed(
+                      AppRouter.AGENT_RENT_DETAIL_SCREEN,
+                      arguments: rent,
+                    );
+                  },
+                  child: Container(
+                    height: 220,
+                    width: MediaQuery.of(context).size.width,
+                    padding: const EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(12.0),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.location_on, color: Colors.red, size: 18.0),
-                        buildSizedBoxWidthFun(context, width: 4),
-                        Expanded(
-                          child: buildTextFun(
-                            context,
-                            sale.addStreet,
-                            fontSize: 14,
+                        buildTextFun(context, rent.addPropertyType,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.black),
+                        buildSizedBoxHeightFun(context, height: 8),
+                        buildTextFun(context, 'Area: ${rent.addSqft}',
+                            fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.black,
-                          ),
+                            color: AppColors.black),
+                        buildSizedBoxHeightFun(context, height: 8),
+                        buildTextFun(context, '₹${rent.addRent}',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.black),
+                        buildSizedBoxHeightFun(context, height: 8),
+                        Row(
+                          children: [
+                            Icon(Icons.location_on,
+                                color: Colors.red, size: 18.0),
+                            buildSizedBoxWidthFun(context, width: 4),
+                            Expanded(
+                              child: buildTextFun(
+                                context,
+                                rent.addStreet,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        buildSizedBoxHeightFun(context, height: 10),
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today,
+                                color: Colors.red, size: 18.0),
+                            buildSizedBoxWidthFun(context, width: 4),
+                            buildTextFun(context,
+                                getTimeDifference(rent.addRentCreatedAt),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.black),
+                          ],
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: buildTextFun(context, 'View Details >>',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.orange),
                         ),
                       ],
                     ),
-                    buildSizedBoxHeightFun(context, height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.calendar_today,
-                            color: Colors.red, size: 18.0),
-                        buildSizedBoxWidthFun(context, width: 4),
-                        buildTextFun(
-                            context, getTimeDifference(sale.addRentCreatedAt),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.black),
-                      ],
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: buildTextFun(context, 'View Details >>',
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.orange),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          },
-        );
-      }));
+              );
+            },
+          );
+        }));
+  });
 }
 
 String getTimeDifference(DateTime postTime) {
@@ -1586,7 +1622,9 @@ String getTimeDifference(DateTime postTime) {
 }
 
 buildProfileHeaderFun(
-    BuildContext context, String profile, AgentController controller) {
+  BuildContext context,
+  String profile,
+) {
   return Column(
     crossAxisAlignment:
         CrossAxisAlignment.start, // Aligns children to the start
@@ -1597,12 +1635,10 @@ buildProfileHeaderFun(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
-            GestureDetector(
+            InkWell(
               onTap: () {
                 print('profile screen click');
-
-                controller.selectedIndex.value = 2;
-                Get.toNamed(AppRouter.AGENT_MAIN_SCREEN, arguments: 2);
+                Get.back();
               },
               child: const Icon(Icons.arrow_back),
             ),
@@ -1621,7 +1657,7 @@ buildProfileHeaderFun(
   );
 }
 
-Widget buildPropertyDetailsHeaderFun(
+Widget buildPropertySaleDetailsHeaderFun(
   BuildContext context,
   String profile,
   SaleModel? saleModel,
@@ -1674,6 +1710,100 @@ Widget buildPropertyDetailsHeaderFun(
                     // Call deleteSaleData and pass the saleId
                     addPropertyController.deleteSaleData(
                         context, saleModel!.saleId);
+                  },
+                );
+              },
+              icon: const Icon(Icons.delete, color: Colors.red),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget buildPropertyAddHeaderFun(
+  BuildContext context,
+  String profile,
+) {
+  return Column(
+    crossAxisAlignment:
+        CrossAxisAlignment.start, // Aligns children to the start
+    children: [
+      buildTopLogoFun(context, AppConstants.vaadagaiLogoUrl),
+      buildSizedBoxHeightFun(context, height: 16),
+      Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              print('Property Details screen click');
+              Get.back();
+            },
+            child: const Icon(Icons.arrow_back),
+          ),
+          const SizedBox(width: 8), // Adds spacing between the icon and text
+          buildTextFun(
+            context,
+            profile,
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            color: AppColors.black,
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+buildPropertyRentDetailsHeaderFun(BuildContext context, String propertyDetails,
+    RentModel? rentModel, AddPropertyController addPropertyController) {
+  return Column(
+    crossAxisAlignment:
+        CrossAxisAlignment.start, // Aligns children to the start
+    children: [
+      buildTopLogoFun(context, AppConstants.vaadagaiLogoUrl),
+      buildSizedBoxHeightFun(context, height: 16),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                print('Property Details screen click');
+                Get.back();
+              },
+              child: const Icon(Icons.arrow_back),
+            ),
+            const SizedBox(width: 8), // Adds spacing between the icon and text
+            buildTextFun(
+              context,
+              propertyDetails,
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: AppColors.black,
+            ),
+            const Spacer(), // Pushes the buttons to the right side
+            IconButton(
+              onPressed: () {
+                print('Edit button clicked');
+                print("Rent property ID : ${rentModel?.rentId}");
+                Get.toNamed(AppRouter.AGENT_ADD_RENT_SCREEN,
+                    arguments: rentModel);
+              },
+              icon: const Icon(Icons.edit, color: Colors.red),
+            ),
+            IconButton(
+              onPressed: () {
+                Get.defaultDialog(
+                  title: AppConstants.delete,
+                  middleText: AppConstants.deleteMsg,
+                  textConfirm: AppConstants.yes,
+                  textCancel: AppConstants.cancel,
+                  confirmTextColor: Colors.white,
+                  onConfirm: () {
+                    // Call deleteSaleData and pass the saleId
+                    addPropertyController.deleteRentData(
+                        context, rentModel!.rentId);
                   },
                 );
               },

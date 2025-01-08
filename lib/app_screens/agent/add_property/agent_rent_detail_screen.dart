@@ -1,35 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:vaadagai/app_controller/add_property_controller.dart';
-import 'package:vaadagai/app_model/sale_model.dart';
-import 'package:vaadagai/app_utils/app_constants.dart';
-import 'package:vaadagai/app_utils/app_functions.dart';
+import 'package:vaadagai/app_model/rent_model.dart';
 
+import '../../../app_controller/add_property_controller.dart';
+import '../../../app_utils/app_constants.dart';
+import '../../../app_utils/app_functions.dart';
 import '../../profile_screen/agent_profile_screen.dart';
 
-class AgentSaleDetailScreen extends StatefulWidget {
-  const AgentSaleDetailScreen({super.key});
+class AgentRentDetailScreen extends StatefulWidget {
+  const AgentRentDetailScreen({super.key});
 
   @override
-  State<AgentSaleDetailScreen> createState() => _AgentSaleDetailScreenState();
+  State<AgentRentDetailScreen> createState() => _AgentRentDetailScreenState();
 }
 
-class _AgentSaleDetailScreenState extends State<AgentSaleDetailScreen> {
+class _AgentRentDetailScreenState extends State<AgentRentDetailScreen> {
   final AddPropertyController addPropertyController =
       Get.put(AddPropertyController());
 
-  SaleModel? saleModel;
+  RentModel? rentModel;
 
   @override
   void initState() {
     super.initState();
 
-    saleModel = Get.arguments as SaleModel;
+    rentModel = Get.arguments as RentModel;
 
-    print("Sale ID : ${saleModel?.saleId}");
+    print("Rent ID : ${rentModel?.rentId}");
 
     addPropertyController
-        .listenToSalePropertyDetailsDataUpdates(saleModel!.saleId);
+        .listenToRentPropertyDetailsDataUpdates(rentModel!.rentId);
   }
 
   @override
@@ -44,10 +44,10 @@ class _AgentSaleDetailScreenState extends State<AgentSaleDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  buildPropertySaleDetailsHeaderFun(
+                  buildPropertyRentDetailsHeaderFun(
                     context,
                     AppConstants.propertyDetails,
-                    saleModel,
+                    rentModel,
                     addPropertyController,
                   ),
                   Expanded(
@@ -55,7 +55,7 @@ class _AgentSaleDetailScreenState extends State<AgentSaleDetailScreen> {
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16), // Adjust content padding
-                      child: buildSalePropertyDetails(
+                      child: buildRentPropertyDetails(
                         context,
                         addPropertyController,
                       ),
@@ -82,7 +82,7 @@ class _AgentSaleDetailScreenState extends State<AgentSaleDetailScreen> {
   }
 }
 
-buildSalePropertyDetails(
+buildRentPropertyDetails(
   BuildContext context,
   AddPropertyController addPropertyController,
 ) {
@@ -97,46 +97,46 @@ buildSalePropertyDetails(
           buildSizedBoxHeightFun(context, height: 16),
           buildTitleSubtitleWithColumn(context,
               title: AppConstants.propertyType,
-              subTitle: addPropertyController.addPropertyType),
+              subTitle: addPropertyController.rentPropertyType),
           buildSizedBoxHeightFun(context, height: 16),
           buildTitleSubtitleWithColumn(context,
               title: AppConstants.postalCode,
-              subTitle: addPropertyController.addPostalCode),
+              subTitle: addPropertyController.rentPostalCode),
           buildSizedBoxHeightFun(context, height: 16),
           buildTitleSubtitleWithColumn(context,
               title: AppConstants.unit,
-              subTitle: addPropertyController.addUnit),
+              subTitle: addPropertyController.rentUnit),
           buildSizedBoxHeightFun(context, height: 16),
           buildTitleSubtitleWithColumn(context,
               title: AppConstants.street,
-              subTitle: addPropertyController.addStreet),
-          buildSizedBoxHeightFun(context, height: 16),
-          buildTitleSubtitleWithColumn(context,
-              title: AppConstants.totalFloors,
-              subTitle: addPropertyController.addTotalFloors),
+              subTitle: addPropertyController.rentStreet),
           buildSizedBoxHeightFun(context, height: 16),
           buildTitleSubtitleWithColumn(context,
               title: AppConstants.floorNo,
-              subTitle: addPropertyController.addFloorNo),
+              subTitle: addPropertyController.rentFloorNo),
           buildSizedBoxHeightFun(context, height: 16),
           buildTitleSubtitleWithColumn(context,
               title: AppConstants.builtUpAreaSqft,
-              subTitle: addPropertyController.addSqft),
+              subTitle: addPropertyController.rentSqft),
           buildSizedBoxHeightFun(context, height: 16),
           buildTitleSubtitleWithColumn(context,
-              title: AppConstants.bhk, subTitle: addPropertyController.addBhk),
+              title: AppConstants.bhk, subTitle: addPropertyController.rentBhk),
           buildSizedBoxHeightFun(context, height: 16),
           buildTitleSubtitleWithColumn(context,
               title: AppConstants.bathrooms,
-              subTitle: addPropertyController.addBathrooms),
+              subTitle: addPropertyController.rentBathrooms),
           buildSizedBoxHeightFun(context, height: 16),
           buildTitleSubtitleWithColumn(context,
-              title: AppConstants.price,
-              subTitle: addPropertyController.addPrice),
+              title: AppConstants.advance,
+              subTitle: addPropertyController.rentAdvance),
+          buildSizedBoxHeightFun(context, height: 16),
+          buildTitleSubtitleWithColumn(context,
+              title: AppConstants.rent,
+              subTitle: addPropertyController.addRent),
           buildSizedBoxHeightFun(context, height: 16),
           buildTitleSubtitleWithColumn(context,
               title: AppConstants.additionalDetails,
-              subTitle: addPropertyController.addAdditionalDetails),
+              subTitle: addPropertyController.rentAdditionalDetails),
           buildSizedBoxHeightFun(context, height: 50),
         ],
       ),
