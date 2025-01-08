@@ -99,6 +99,7 @@ class AddPropertyController extends GetxController {
   RxString selectedPropertyType = ''.obs;
 
   var selectedIndex = 0.obs;
+
   void onTabChanged(int index) {
     selectedIndex.value = index;
   }
@@ -118,43 +119,85 @@ class AddPropertyController extends GetxController {
   final addAdvanceController = TextEditingController();
   final addRentController = TextEditingController();
 
-  Future<void> addSaleProperty(BuildContext context) async {
+  Future<void> addUpdateSaleProperty(BuildContext context,
+      {String? updateSaleId, DateTime? createdAt}) async {
     if (await addSalePropertyValidationFields(context)) {
       try {
-        var currentDateTime = DateTime.now();
-        var docRef =
-            firebaseFirestore.collection(AppConstants.collectionForSale).doc();
-        var saleId = docRef.id;
+        print("Update SaleID :$updateSaleId");
 
-        var userId = UsersStorageService.getUserId();
-        var userType = UsersStorageService.getUserType();
-        var userName = UsersStorageService.getUserName();
+        print("createdAt :$createdAt");
 
-        var saleData = SaleModel(
-            saleId: saleId,
-            addPropertyType: selectedPropertyType.value,
-            addPostalCode: addPostalCodeController.text.trim(),
-            addUnit: addUnitController.text.trim(),
-            addStreet: addStreetController.text.trim(),
-            addTotalFloors: addTotalFloorsController.text.trim(),
-            addFloorNo: addFloorNoController.text.trim(),
-            addSqft: addSqftController.text.trim(),
-            addBhk: addBhkController.text.trim(),
-            addBathrooms: addBathroomsController.text.trim(),
-            addPrice: addPriceController.text.trim(),
-            addAdditionalDetails: addAdditionalDetailsController.text.trim(),
-            addSaleCreatedAt: currentDateTime,
-            userId: userId,
-            userType: userType.toString(),
-            userName: userName.toString());
+        if (updateSaleId!.isNotEmpty) {
+          var docRef =
+              firebaseFirestore.collection(AppConstants.collectionForSale);
 
-        await docRef.set(saleData.toMap());
+          var userId = UsersStorageService.getUserId();
+          var userType = UsersStorageService.getUserType();
+          var userName = UsersStorageService.getUserName();
 
-        print("Add Sale : ${saleData.toString()}");
-        Get.offNamed(AppRouter.AGENT_MAIN_SCREEN);
-        buildScaffoldSuccessMessage(context, "Successfully Add Sale Details");
+          var saleData = SaleModel(
+              saleId: updateSaleId,
+              addPropertyType: selectedPropertyType.value,
+              addPostalCode: addPostalCodeController.text.trim(),
+              addUnit: addUnitController.text.trim(),
+              addStreet: addStreetController.text.trim(),
+              addTotalFloors: addTotalFloorsController.text.trim(),
+              addFloorNo: addFloorNoController.text.trim(),
+              addSqft: addSqftController.text.trim(),
+              addBhk: addBhkController.text.trim(),
+              addBathrooms: addBathroomsController.text.trim(),
+              addPrice: addPriceController.text.trim(),
+              addAdditionalDetails: addAdditionalDetailsController.text.trim(),
+              addSaleCreatedAt: DateTime.parse(createdAt!.toString()),
+              userId: userId,
+              userType: userType.toString(),
+              userName: userName.toString());
 
-        clearController(context);
+          await docRef.doc(updateSaleId).update(saleData.toMap());
+
+          print("Update Sale : ${saleData.toString()}");
+          Get.offNamed(AppRouter.AGENT_MAIN_SCREEN);
+          buildScaffoldSuccessMessage(
+              context, "Successfully Update Sale Details");
+
+          clearController(context);
+        } else {
+          var currentDateTime = DateTime.now();
+          var docRef = firebaseFirestore
+              .collection(AppConstants.collectionForSale)
+              .doc();
+          var saleId = docRef.id;
+
+          var userId = UsersStorageService.getUserId();
+          var userType = UsersStorageService.getUserType();
+          var userName = UsersStorageService.getUserName();
+
+          var saleData = SaleModel(
+              saleId: saleId,
+              addPropertyType: selectedPropertyType.value,
+              addPostalCode: addPostalCodeController.text.trim(),
+              addUnit: addUnitController.text.trim(),
+              addStreet: addStreetController.text.trim(),
+              addTotalFloors: addTotalFloorsController.text.trim(),
+              addFloorNo: addFloorNoController.text.trim(),
+              addSqft: addSqftController.text.trim(),
+              addBhk: addBhkController.text.trim(),
+              addBathrooms: addBathroomsController.text.trim(),
+              addPrice: addPriceController.text.trim(),
+              addAdditionalDetails: addAdditionalDetailsController.text.trim(),
+              addSaleCreatedAt: currentDateTime,
+              userId: userId,
+              userType: userType.toString(),
+              userName: userName.toString());
+
+          await docRef.set(saleData.toMap());
+
+          print("Add Sale : ${saleData.toString()}");
+          Get.offNamed(AppRouter.AGENT_MAIN_SCREEN);
+          buildScaffoldSuccessMessage(context, "Successfully Add Sale Details");
+
+          clearController(context);
+        }
       } catch (e) {
         buildScaffoldErrorMessage(context, "fail to add Sale : $e");
       }
@@ -260,10 +303,10 @@ class AddPropertyController extends GetxController {
 
         print("Add Sale : ${rentData.toString()}");
 
-        buildScaffoldSuccessMessage(context, "successfully Add Rent Details");
+        Get.offNamed(AppRouter.AGENT_MAIN_SCREEN);
+        buildScaffoldSuccessMessage(context, "Successfully Add Rent Details");
 
         clearController(context);
-        fetchSale();
       } catch (e) {
         buildScaffoldErrorMessage(context, "failed to add Rent $e");
       }
@@ -412,20 +455,21 @@ class AddPropertyController extends GetxController {
 
   void deleteSaleData(BuildContext context, String saleId) async {
     try {
-      // Delete the document with the given saleId
+      isLoading.value = true;
+
       await firebaseFirestore
           .collection(AppConstants.collectionForSale)
           .doc(saleId)
           .delete();
 
-      // Notify success
       buildScaffoldSuccessMessage(context, "Sale Data successfully Deleted");
 
       clearController(context);
       Get.toNamed(AppRouter.AGENT_MAIN_SCREEN);
       fetchSale();
+      isLoading.value = false;
     } catch (e) {
-      // Handle errors
+      isLoading.value = false;
       buildScaffoldErrorMessage(context, "Failed to delete sale data: $e");
     }
   }

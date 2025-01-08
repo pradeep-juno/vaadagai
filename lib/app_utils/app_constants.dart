@@ -86,6 +86,7 @@ class AppConstants {
 
   static const deleteMsg = "Are you sure you want to delete this sale?";
   static const yes = "Yes";
+  static const delete = "Delete Confirmation";
 
   //Images
   static const vaadagaiLogoUrl =

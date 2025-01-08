@@ -1019,11 +1019,14 @@ buildAgentAddSaleButtonFun(BuildContext context,
               if (addPropertyController.isSaleEditId.value) {
                 // Update operation
                 print('Update button clicked!');
+                addPropertyController.addUpdateSaleProperty(context,
+                    updateSaleId: saleModel!.saleId,
+                    createdAt: saleModel!.addSaleCreatedAt);
                 // addPropertyController.updateSaleProperty(context);
               } else {
                 // Add operation
                 print('Add button clicked!');
-                addPropertyController.addSaleProperty(context);
+                addPropertyController.addUpdateSaleProperty(context);
               }
             },
           );
@@ -1342,13 +1345,8 @@ Widget buildSaleFetchContainerFun(
     // Check if the list is empty
     if (addPropertyController.saleList.isEmpty) {
       return Center(
-        child: buildTextFun(
-          context,
-          AppConstants.noData,
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
+        child: buildTextFun(context, AppConstants.noData,
+            fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
       );
     }
 
@@ -1476,7 +1474,7 @@ Widget buildRentFetchContainerFun(
   if (addPropertyController.rentList.isEmpty) {
     return Center(
       child: buildTextFun(context, AppConstants.noData,
-          fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+          fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
     );
   }
 
@@ -1642,7 +1640,7 @@ Widget buildPropertyDetailsHeaderFun(
             GestureDetector(
               onTap: () {
                 print('Property Details screen click');
-                Get.toNamed(AppRouter.AGENT_MAIN_SCREEN);
+                Get.back();
               },
               child: const Icon(Icons.arrow_back),
             ),
@@ -1667,7 +1665,7 @@ Widget buildPropertyDetailsHeaderFun(
             IconButton(
               onPressed: () {
                 Get.defaultDialog(
-                  title: '',
+                  title: AppConstants.delete,
                   middleText: AppConstants.deleteMsg,
                   textConfirm: AppConstants.yes,
                   textCancel: AppConstants.cancel,
@@ -1676,11 +1674,6 @@ Widget buildPropertyDetailsHeaderFun(
                     // Call deleteSaleData and pass the saleId
                     addPropertyController.deleteSaleData(
                         context, saleModel!.saleId);
-
-                    Get.back(); // Close the dialog
-                  },
-                  onCancel: () {
-                    Get.back(); // Close the dialog
                   },
                 );
               },

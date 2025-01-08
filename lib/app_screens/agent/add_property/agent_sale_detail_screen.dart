@@ -23,6 +23,7 @@ class _AgentSaleDetailScreenState extends State<AgentSaleDetailScreen> {
   @override
   void initState() {
     super.initState();
+
     saleModel = Get.arguments as SaleModel;
 
     print("Sale ID : ${saleModel?.saleId}");
@@ -35,32 +36,48 @@ class _AgentSaleDetailScreenState extends State<AgentSaleDetailScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              buildPropertyDetailsHeaderFun(
-                context,
-                AppConstants.propertyDetails,
-                saleModel,
-                addPropertyController,
-              ),
-              Expanded(
-                  child: buildCustomScrollbar(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16), // Adjust content padding
-                  child: buildSalePropertyDetails(
+          body: Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  buildPropertyDetailsHeaderFun(
                     context,
+                    AppConstants.propertyDetails,
+                    saleModel,
                     addPropertyController,
                   ),
-                ),
-              )),
-            ],
+                  Expanded(
+                      child: buildCustomScrollbar(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16), // Adjust content padding
+                      child: buildSalePropertyDetails(
+                        context,
+                        addPropertyController,
+                      ),
+                    ),
+                  )),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+          Positioned(
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Obx(() {
+              return addPropertyController.isLoading.value
+                  ? loadingProgress(context)
+                  : const SizedBox.shrink();
+            }),
+          )
+        ],
+      )),
     );
   }
 }
